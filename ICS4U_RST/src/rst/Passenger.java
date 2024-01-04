@@ -13,12 +13,14 @@ public class Passenger {
 	// Instance data fields
 	private String firstName, lastName, email, phoneNumber, loyaltyStatus;
 	private int totalMoney, highScore;
+	private boolean winStatus;
 	private ArrayList<String> miniGamesLeft = new ArrayList<String>();
 	
 	/**
 	 * This default constructor creates a Passenger with a no
 	 * first name, last name, email and phone number; gold loyalty status;
-	 * $2000 total money; $0 high score; and 2 mini games left.
+	 * $2000 total money; is winner (because have total points left);
+	 * $0 high score; and 2 mini games left.
 	 */
 	public Passenger() {
 		firstName = null;
@@ -28,6 +30,7 @@ public class Passenger {
 		loyaltyStatus = null;
 		totalMoney = START_MONEY;
 		highScore = 0;
+		winStatus = true;
 		miniGamesLeft.add("Royal Escape Room");
 		miniGamesLeft.add("Word Unscramble");
 	}
@@ -35,7 +38,8 @@ public class Passenger {
 	/**
 	 * This overloaded constructor creates a Passenger with a no
 	 * first name, last name, email, phone number and loyalty status;
-	 * $2000 total money; given high score; and 2 mini games left.
+	 * $2000 total money; is winner (because have total points left); 
+	 * given high score; and 2 mini games left.
 	 */
 	public Passenger(int hScore) {
 		firstName = null;
@@ -45,6 +49,7 @@ public class Passenger {
 		loyaltyStatus = null;
 		totalMoney = START_MONEY;
 		highScore = hScore;
+		winStatus = true;
 		miniGamesLeft.add("Royal Escape Room");
 		miniGamesLeft.add("Word Unscramble");
 	}
@@ -52,7 +57,8 @@ public class Passenger {
 	/**
 	 * This overloaded constructor creates a Passenger with a their
 	 * first name, last name, email, phone number and loyalty status;
-	 * $2000 total money; given high score; and 2 mini games left.
+	 * $2000 total money; is winner (because have total points left);
+	 * given high score; and 2 mini games left.
 	 */
 	public Passenger(String fName, String lName, String email, String phoneNum, String lStatus, int hScore) {
 		firstName = fName;
@@ -62,6 +68,7 @@ public class Passenger {
 		loyaltyStatus = lStatus;
 		totalMoney = START_MONEY;
 		highScore = hScore;
+		winStatus = true;
 		miniGamesLeft.add("Royal Escape Room");
 		miniGamesLeft.add("Word Unscramble");
 	}
@@ -86,10 +93,94 @@ public class Passenger {
 	
 	public void updateTotalMoney(int bonus) {
 		totalMoney += bonus;
+		
+		// Adjust win status depending on amount of money left
+		if (totalMoney <= 0) {	// if no money or negative money left
+			winStatus = false;
+		} else if (totalMoney > 0) {	// if still money left
+			winStatus = true;
+		}
 	}
 	
 	public ArrayList<String> getMiniGamesLeft() {
 		return miniGamesLeft;
 	}
-
+	
+	public int getMoneyLeft() {
+		return totalMoney;
+	}
+	
+	public String toString() {
+		String passengerString = firstName + " " + lastName + "\n" + email + "\n" + phoneNumber + "\nLoyalty Status: " + loyaltyStatus
+				+ "\nTotal Money: " + totalMoney + "\nHigh Score Out of All Games: " + highScore;
+		return passengerString;
+	}
+	
+	public String getFirstName() {
+		return firstName;
+	}
+	
+	public String getLastName() {
+		return lastName;
+	}
+	
+	public void setFirstName(String fName) {
+		firstName = fName;
+	}
+	
+	public void setLastName(String lName) {
+		lastName = lName;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	public void setPhoneNumber(String phoneNum) {
+		phoneNumber = phoneNum;
+	}
+	
+	public void setLoyaltyStatus(String lStatus) {
+		loyaltyStatus = lStatus;
+	}
+	
+	public String showHighScore() {
+		return "High score (out of all games): $" + highScore;
+	}
+	
+	public void setNewHighScore(int newHighScore) {
+		highScore = newHighScore;
+	}
+	
+	public int getHighScore() {
+		return highScore;
+	}
+	
+	public void resetHighScore() {
+		highScore = 0;
+	}
+	
+	public boolean getWinStatus() {
+		return winStatus;
+	}
+	
+	public String showOverallResult() {
+		String result = firstName + " " + lastName + " ";
+		
+		if (winStatus) {
+			result += "won!";
+		} else {
+			result += "lost!";
+		}
+		
+		result += "\nYou had $" + totalMoney + "left.\n";
+		
+		if (totalMoney > highScore) {
+			result += "You set a new high score!\n";
+		}
+		
+		result += showHighScore();
+		
+		return result;
+	}
 }
