@@ -8,9 +8,9 @@ public abstract class Scenario {
 	// Instance data field containing the cost a scenario results in
 	protected int cost;
 	
-	protected int getCost() {
+	public int getCost() {
 		return cost;
 	}
 	
-	protected abstract String showCost();
+	public abstract String showCost();
 }
