@@ -11,7 +11,7 @@ public class ActivitiesScenario extends Scenario {
 	
 	public ActivitiesScenario(int[] numOfEachActivity) {
 		this.numOfEachActivity = numOfEachActivity;
-		cost = 0;
+		changeInMoney = 0;
 	}
 	
 	public static String showInstructions() {
@@ -20,12 +20,12 @@ public class ActivitiesScenario extends Scenario {
 	
 	public void calculateCost() {
 		for (int i = 0; i < ACTIVITIES.length; i++) {
-			cost += (i * numOfEachActivity[i]);
+			changeInMoney -= (i * numOfEachActivity[i]);
 		}
 	}
 	
-	public String showCost() {
-		return "Total cost: $" + cost;
+	public String showChangeInMoney() {
+		return "Total cost: $" + (-1 * changeInMoney);
 	}
 	
 }
