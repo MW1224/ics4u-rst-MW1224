@@ -6,11 +6,11 @@ package rst;
 public abstract class Scenario {
 
 	// Instance data field containing the cost a scenario results in
-	protected int cost;
+	protected int changeInMoney;
 	
-	public int getCost() {
-		return cost;
+	public int getChangeInMoney() {
+		return changeInMoney;
 	}
 	
-	public abstract String showCost();
+	public abstract String showChangeInMoney();
 }
