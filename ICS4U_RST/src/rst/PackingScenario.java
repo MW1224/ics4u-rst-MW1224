@@ -38,7 +38,7 @@ public class PackingScenario extends Scenario {
 			result = "Oh no! Your suitcase is " + (weight - WEIGHT_LIMIT) + " lbs over the weight limit.";
 		} else if (weight < WEIGHT_LIMIT) {
 			changeInMoney = 10;
-			result = "Good job! Your suitcase is " + (WEIGHT_LIMIT - weight) + " lbs under the weight limit";
+			result = "Good job! Your suitcase is " + (WEIGHT_LIMIT - weight) + " lbs under the weight limit.";
 		} else {
 			changeInMoney = 0;
 			result = "Your suitcase is right on the weight limit of " + WEIGHT_LIMIT + " lbs.";
