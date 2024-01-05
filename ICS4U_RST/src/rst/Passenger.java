@@ -106,6 +106,10 @@ public class Passenger {
 		return miniGamesLeft;
 	}
 	
+	public void removeMiniGame(String miniGame) {
+		miniGamesLeft.remove(miniGame);
+	}
+	
 	public int getMoneyLeft() {
 		return totalMoney;
 	}
