@@ -34,13 +34,17 @@ public class Lock {
 		return clue;
 	}
 	
-	public String getHint() {
+	public boolean isEligibleForHint() {
 		if (hintCount == 0) {
-			hintCount++;
-			return "Hint (-$3): " + hint;
+			return true;
 		} else {
-			return "Already got hint. (" + hint + ")";
+			return false;
 		}
+	}
+	
+	public String getHint() {
+		hintCount++;
+		return "Hint (-$3): " + hint;
 	}
 	
 	public int getLockNumber() {
