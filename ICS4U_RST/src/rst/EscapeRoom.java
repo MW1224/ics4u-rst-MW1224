@@ -59,11 +59,69 @@ public class EscapeRoom extends MiniGame {
 		return strLocks;
 	}
 	
+	public boolean getLockState(int lockNum) {
+		return allLocks.get(lockNum - 1).isOpen();
+	}
+	
 	public String getLockClue(int lockNum) {
 		return allLocks.get(lockNum - 1).getClue();
 	}
 	
 	public String getLockHint(int lockNum) {
 		return allLocks.get(lockNum - 1).getHint();
+	}
+	
+	public String getConsonantPyramid(String word) {
+		String pyramid = "";
+		
+		word.toUpperCase();
+		
+		consonantPyramid(word + "a", word.length());
+		
+		for (String row : pyramidOutput) {
+			pyramid += row + "\n";
+		}
+		
+		return pyramid;
+	}
+	
+	private void consonantPyramid(String word, int vowelIndex) {
+		final char[] VOWELS = {'a', 'e', 'i', 'o', 'u', 'y'};
+		boolean containsVowel = false;
+		
+		// First, check if word contains a vowel in order to create a pyramid by removing vowels
+		for (char vowel: VOWELS) {
+			if (word.contains(String.valueOf(vowel))) {
+				containsVowel = true;
+			}
+		}
+		
+		if (containsVowel) {
+			checkVowelFromEnd:
+			for (int i = word.length() - 1; i >= 0; i--) {
+				for (char testVowel : VOWELS) {
+					if (word.charAt(i) == testVowel) {
+						vowelIndex = i;
+						break checkVowelFromEnd;
+					}
+				}
+			}
+			
+			String shortenedWord = word.substring(0, vowelIndex) + word.substring(vowelIndex + 1);;		
+			consonantPyramid(shortenedWord, vowelIndex);
+			pyramidOutput.add(shortenedWord);
+		}
+	}
+	
+	public boolean validateWord(String word) {
+		boolean isValidWord = true;
+		
+		for (int i = 0; i < word.length(); i++) {
+			if (!Character.isLetter(word.charAt(i))) {
+				isValidWord = false;
+			}
+		}
+		
+		return isValidWord;
 	}
 }
