@@ -17,6 +17,7 @@ public class EscapeRoom extends MiniGame {
 	public EscapeRoom() {
 		allLocks = new ArrayList<Lock>();
 		pyramidOutput = new ArrayList<String>();
+		bonusMoney = START_BONUS;
 		
 		for (int i = 0; i < FIRST_FIVE_LOCK_COMBOS.length; i++) {
 			allLocks.add(new Lock(LOCK_CLUES[i], LOCK_HINTS[i], FIRST_FIVE_LOCK_COMBOS[i], (i + 1)));
@@ -26,7 +27,8 @@ public class EscapeRoom extends MiniGame {
 	public static String showInstructions() {
 		return "You are on a ship that is about to sink. You must find\nyour life boat to escape and survive. However, it is\nlocked, and in"
 				+ " order to find that lock combination,\nyou first need to unlock 5 other locks.\nYou start with $" + START_BONUS + " bonus"
-				+ " money. For each incorrect guess,\n$6 gets subtracted from the bonus. For each hint,\n$3 gets subtracted.";
+				+ " money. For each incorrect guess,\n$" + INCORRECT_FEE + " gets subtracted from the bonus. For each hint,\n$"
+				+ HINT_FEE + " gets subtracted.";
 	}
 	
 	public String attemptUnlock(String strLock, int code) {
@@ -68,7 +70,14 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public String getLockHint(int lockNum) {
-		return allLocks.get(lockNum - 1).getHint();
+		Lock lock = allLocks.get(lockNum - 1);
+		
+		if (lock.isEligibleForHint()) {
+			bonusMoney -= HINT_FEE;
+			return lock.getHint();
+		} else {
+			return "Hint already received.";
+		}
 	}
 	
 	public String getConsonantPyramid(String word) {
@@ -123,5 +132,40 @@ public class EscapeRoom extends MiniGame {
 		}
 		
 		return isValidWord;
+	}
+	
+	public boolean needsVisual(int lockNum) {
+		if (lockNum == 2 || lockNum == 3 || lockNum == 5) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public String [][] getLockVisual(int lockNum) {
+		final String BLUE_UMBRELLA = "BLUE_UMBRELLA", PINK_UMBRELLA = "PINK_UMBRELLA", GREEN_UMBRELLA = "GREEN_UMBRELLA",
+				OASIS = "OASIS_OF_THE_SEAS", ICON = "ICON_OF_THE_SEAS", ODYSSEY = "ODYSSEY_OF_THE_SEAS", FORMAL = "FORMAL_ATTIRE",
+				CASUAL = "CASUAL_ATTIRE", SMART_CASUAL = "SMART_CASUAL_ATTIRE";
+		
+		if (lockNum == 2) {
+			String [][] UMBRELLA_GRID = {{GREEN_UMBRELLA, BLUE_UMBRELLA, BLUE_UMBRELLA, PINK_UMBRELLA, GREEN_UMBRELLA},
+					{BLUE_UMBRELLA, BLUE_UMBRELLA, PINK_UMBRELLA, BLUE_UMBRELLA, GREEN_UMBRELLA}};
+			return UMBRELLA_GRID;
+			
+		} else if (lockNum == 3) {
+			final String [][] CRUISE_SHIP_GRID = {{OASIS, ODYSSEY, OASIS, ICON, ODYSSEY}, {ICON, ICON, OASIS, OASIS, ICON}};
+			return CRUISE_SHIP_GRID;
+			
+		} else if (lockNum == 5) {
+			String [][] ATTIRE_GRID = {{CASUAL, FORMAL, SMART_CASUAL, SMART_CASUAL, SMART_CASUAL},
+					{FORMAL, CASUAL, CASUAL, SMART_CASUAL, FORMAL}};
+			return ATTIRE_GRID;
+		} else {
+			return null;
+		}
+	}
+	
+	public String toString() {
+		return "Royal Escape Room";
 	}
 }
