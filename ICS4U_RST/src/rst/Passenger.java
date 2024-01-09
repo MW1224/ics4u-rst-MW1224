@@ -74,8 +74,8 @@ public class Passenger {
 	}
 	
 	public static String showGameIntro() {
-		return "You are on a 2-day cruise vacation aboard\nRoyal Caribbean's Oasis of the Seas. You will"
-				+ "\nplay a variety of mini games and choose your\nown adventure given some scenarios.";
+		return "You are on a 2-day cruise\nvacation aboard Royal Caribbean's\nOasis of the Seas. You will\n"
+				+ "play a variety of mini\ngames and choose your own\nadventure given some scenarios.";
 	}
 	
 	public static String showGameGoal() {
