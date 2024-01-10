@@ -23,7 +23,7 @@ public class CruiseStoryGame extends Application {
 	
 	// Global constants
 	private static final int GAP = 10;
-	private static final int SMALL_FONT = 14, MEDIUM_FONT = 20, LARGE_FONT = 26;
+	private static final int SMALL_FONT = 14, MEDIUM_FONT = 19, LARGE_FONT = 26;
 	
 	// References for objects
 	Passenger passenger;
@@ -42,8 +42,6 @@ public class CruiseStoryGame extends Application {
 	 */
 	@Override
 	public void start(Stage myStage) throws Exception {
-		// Local constants
-		final int NUM_OF_TILE_COLS = 4;
 		
 		// Set layout
 		VBox root = new VBox(GAP);
@@ -60,26 +58,50 @@ public class CruiseStoryGame extends Application {
 		root.getChildren().add(imgLogo);
 		
 		// TilePane layout
-		TilePane tileInstructions = new TilePane();
-		tileInstructions.setPrefColumns(NUM_OF_TILE_COLS);
+		TilePane tileInstructions = new TilePane(10, 0);
 		tileInstructions.setAlignment(Pos.CENTER);
-		// ImageViews to hold image of Oasis of the Seas (cruise ship's name) & its aqua theatre
+		// ImageViews to hold images of Oasis of the Seas
 		ImageView imgOasis = new ImageView(new Image(getClass().getResource("/images/oasis.png").toString()));
+		imgOasis.setFitHeight(200);
+		imgOasis.setPreserveRatio(true);
 		ImageView imgAquaTheatre = new ImageView(new Image(getClass().getResource("/images/aquaTheatre.png").toString()));
+		imgAquaTheatre.setFitHeight(200);
+		imgAquaTheatre.setPreserveRatio(true);
+		ImageView imgOasis2 = new ImageView(new Image(getClass().getResource("/images/oasis2.png").toString()));
+		imgOasis2.setFitHeight(200);
+		imgOasis2.setPreserveRatio(true);
+		ImageView imgBoardwalk = new ImageView(new Image(getClass().getResource("/images/boardwalk.png").toString()));
+		imgBoardwalk.setFitHeight(200);
+		imgBoardwalk.setPreserveRatio(true);
+		ImageView imgOasisBack = new ImageView(new Image(getClass().getResource("/images/oasisBack.png").toString()));
+		imgOasisBack.setFitHeight(200);
+		imgOasisBack.setPreserveRatio(true);
+		ImageView imgCentralPark = new ImageView(new Image(getClass().getResource("/images/centralPark.png").toString()));
+		imgCentralPark.setFitHeight(200);
+		imgCentralPark.setPreserveRatio(true);
+		ImageView imgCentralPark2 = new ImageView(new Image(getClass().getResource("/images/centralPark2.png").toString()));
+		imgCentralPark2.setFitHeight(200);
+		imgCentralPark2.setPreserveRatio(true);
+		ImageView imgOasisTop = new ImageView(new Image(getClass().getResource("/images/oasisTop.png").toString()));
+		imgOasisTop.setFitHeight(200);
+		imgOasisTop.setPreserveRatio(true);
 		// Label to hold the game's intro & overall instructions
 		Label lblIntro = new Label(Passenger.showGameIntro());
 		lblIntro.setFont(Font.font(MEDIUM_FONT));
+		lblIntro.setWrapText(true);
 		// Label to hold game's goal information
 		Label lblGoal = new Label(Passenger.showGameGoal());
 		lblGoal.setFont(Font.font(MEDIUM_FONT));
-		// ImageViews to hold images of Oasis OTS's Central Park
-		ImageView imgCentralPark = new ImageView(new Image(getClass().getResource("/images/centralPark.png").toString()));
-		ImageView imgCentralPark2 = new ImageView(new Image(getClass().getResource("/images/centralPark2.png").toString()));
-		tileInstructions.getChildren().addAll(imgOasis, imgAquaTheatre, lblIntro, lblGoal, imgCentralPark, imgCentralPark2);
+		lblGoal.setWrapText(true);
+		tileInstructions.getChildren().addAll(imgOasis, imgAquaTheatre, imgOasis2, lblIntro, imgBoardwalk, imgOasisBack, lblGoal, imgCentralPark, imgCentralPark2, imgOasisTop);
+		tileInstructions.setPrefTileHeight(210);
+		tileInstructions.setPrefTileWidth(240);
+		tileInstructions.setPrefHeight(420);
+		tileInstructions.setPrefWidth(1200);
 		root.getChildren().add(tileInstructions);
 		
 		// Create scene with root VBox
-		Scene mainScene = new Scene(root);
+		Scene mainScene = new Scene(root, 1400, 900);
 		
 		myStage.setTitle("Cruise Story Game");
 		myStage.setScene(mainScene);
