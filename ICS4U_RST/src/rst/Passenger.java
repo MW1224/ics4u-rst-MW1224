@@ -74,12 +74,12 @@ public class Passenger {
 	}
 	
 	public static String showGameIntro() {
-		return "You are on a 2-day cruise\nvacation aboard Royal Caribbean's\nOasis of the Seas. You will\n"
-				+ "play a variety of mini\ngames and choose your own\nadventure given some scenarios.";
+		return "You are on a 2-day cruise vacation aboard Royal Caribbean's Oasis of the Seas. You will"
+				+ " play a variety of mini games and choose your own adventure given some scenarios.";
 	}
 	
 	public static String showGameGoal() {
-		return "Goal: Don't run out of money at the end\nof the two days! You will win if you still have\n"
+		return "Goal: Don't run out of money at the end of the two days! You will win if you still have "
 				+ "money left. You will start with $" + START_MONEY;
 	}
 	
