@@ -46,6 +46,11 @@ public class RouteCard extends Button {
 		setText(String.valueOf(cardNum));
 	}
 	
+	public static String showInstructions() {
+		return "There are " + ROUTE_NAMES.length + " possible cruise routes, and each route costs a different amount of money."
+					+ " Click on one card to flip it over and reveal your cruise's route.";
+	}
+	
 	public int getChangeInMoney() {
 		return -1 * cost;
 	}
@@ -63,5 +68,9 @@ public class RouteCard extends Button {
 	
 	public String showResult() {
 		return "Cruise route: " + routeName + "\nCost: $" + cost;
+	}
+	
+	public String toString() {
+		return "Cruise Route Random Selection";
 	}
 }
