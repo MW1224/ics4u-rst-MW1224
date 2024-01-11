@@ -69,8 +69,4 @@ public class RouteCard extends Button {
 	public String showResult() {
 		return "Cruise route: " + routeName + "\nCost: $" + cost;
 	}
-	
-	public String toString() {
-		return "Cruise Route Random Selection";
-	}
 }
