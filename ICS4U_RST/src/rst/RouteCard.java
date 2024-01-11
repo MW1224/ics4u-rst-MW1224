@@ -1,11 +1,13 @@
 package rst;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class RouteCard extends Button {
 
+	public static final int CARD_DIMENSION = 120;
 	private static final Image SCANDINAVIA = new Image(RouteCard.class.getResource("/images/SCANDINAVIA.png").toString());
 	private static final Image SOUTH_AMERICA = new Image(RouteCard.class.getResource("/images/SOUTH_AMERICA.png").toString());
 	private static final Image WEST_COAST = new Image(RouteCard.class.getResource("/images/WEST_COAST.png").toString());
@@ -42,8 +44,15 @@ public class RouteCard extends Button {
 		state = false;
 		routeName = ROUTE_NAMES[cardNum - 1];
 		cost = ROUTE_COSTS[cardNum - 1];
-		setGraphic(new ImageView(BLANK));
 		setText(String.valueOf(cardNum));
+		setContentDisplay(ContentDisplay.BOTTOM);
+		setPrefSize(CARD_DIMENSION, CARD_DIMENSION);
+		setWrapText(true);
+		
+		ImageView imgBlank = new ImageView(BLANK);
+		imgBlank.setFitHeight(CARD_DIMENSION - 20);
+		imgBlank.setPreserveRatio(true);
+		setGraphic(imgBlank);
 	}
 	
 	public static String showInstructions() {
@@ -61,7 +70,11 @@ public class RouteCard extends Button {
 	
 	public void selectRouteCard() {
 		if (!state) {
-			setGraphic(new ImageView(ROUTE_IMAGES[cardNum]));
+			ImageView imgRoute = new ImageView(ROUTE_IMAGES[cardNum]);
+			imgRoute.setFitHeight(CARD_DIMENSION);
+			imgRoute.setPreserveRatio(true);
+			setGraphic(imgRoute);
+			
 			setText(routeName + " ($" + cost + ")");
 		}
 	}
