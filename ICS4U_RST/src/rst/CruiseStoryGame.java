@@ -16,7 +16,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -33,14 +32,18 @@ public class CruiseStoryGame extends Application {
 	private static final int GAP = 10;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	
-	// References for objects
+	// References for global objects
 	Passenger passenger;
+	RouteCard[][] routeGrid;
 	
-	// Input/output UI controls for main screen
+	// Input/output UI controls
+	// For Cruise Story Game main screen
 	private Label lblHighScore, lblErrorMessage;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
 	private ChoiceBox<String> chcLoyaltyStatus;
 	private Scene mainScene;
+	// For Cruise Route Random Selection screen
+	private Label lblRemainingMoney, lblRoute;
 	
 	/**
 	 * Overridden method to handle what happens when application stops.
@@ -238,8 +241,8 @@ public class CruiseStoryGame extends Application {
 	private void showCruiseRouteScreen() {
 		// Local constants
 		final int GRID_DIMENSION = 4;
-		final int TILE_HEIGHT = 200, TILE_WIDTH = 200;
-		final int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 900;
+		final int TILE_DIMENSION = RouteCard.CARD_DIMENSION + 10;
+		final int SCREEN_WIDTH = 790, SCREEN_HEIGHT = 900;
 		
 		// Local variables
 		int cardNum = 1;
@@ -252,40 +255,59 @@ public class CruiseStoryGame extends Application {
 		VBox vbxTop = new VBox();
 		// Label for title
 		Label lblTitle = new Label("Cruise Route Random Selection");
-		lblTitle.setFont(Font.font(LARGE_FONT));
-		lblTitle.setAlignment(Pos.CENTER);
+		lblTitle.setFont(Font.font(XL_FONT));
 		// Label for instructions
 		Label lblInstructions = new Label(RouteCard.showInstructions());
 		lblInstructions.setFont(Font.font(MEDIUM_FONT));
 		lblInstructions.setWrapText(true);
+		lblInstructions.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		// Add to parent node VBox
 		vbxTop.getChildren().addAll(lblTitle, lblInstructions);
+		vbxTop.setAlignment(Pos.CENTER);
 		root.setTop(vbxTop);
-		BorderPane.setAlignment(vbxTop, Pos.TOP_CENTER);
 		
 		// CENTER section of the BorderPane layout
 		TilePane tileCenter = new TilePane(GAP, GAP);
 		tileCenter.setPrefColumns(GRID_DIMENSION);
-		tileCenter.setPrefTileHeight(TILE_HEIGHT);
-		tileCenter.setPrefTileWidth(TILE_WIDTH);
-		tileCenter.setPrefHeight(TILE_HEIGHT * GRID_DIMENSION);
-		tileCenter.setPrefWidth(TILE_WIDTH * GRID_DIMENSION);
+		tileCenter.setPrefTileHeight(TILE_DIMENSION);
+		tileCenter.setPrefTileWidth(TILE_DIMENSION);
+		tileCenter.setPrefSize(TILE_DIMENSION * GRID_DIMENSION, TILE_DIMENSION * GRID_DIMENSION);
 		
 		// Create 4x4 grid for RouteCards
-		RouteCard[][] routeGrid = new RouteCard[GRID_DIMENSION][GRID_DIMENSION];
+		routeGrid = new RouteCard[GRID_DIMENSION][GRID_DIMENSION];
 		
 		for (int row = 0; row < routeGrid.length; row++) {
 			for (int col = 0; col < routeGrid[row].length; col++) {
 				routeGrid[row][col] = new RouteCard(cardNum);	// instantiate each RouteCard in the 2D array
 				routeGrid[row][col].setOnAction(event -> selectRoute(event));
-				routeGrid[row][col].setPrefSize(TILE_WIDTH, TILE_HEIGHT);
 				tileCenter.getChildren().add(routeGrid[row][col]);
 				
 				cardNum++;
 			}
 		}
-		
 		root.setCenter(tileCenter);
+		
+		// LEFT section of the BorderPane layout
+		lblRemainingMoney = new Label(passenger.showMoneyLeft());
+		lblRemainingMoney.setFont(Font.font(MEDIUM_FONT));
+		lblRemainingMoney.setPrefWidth(100);
+		lblRemainingMoney.setWrapText(true);
+		root.setLeft(lblRemainingMoney);
+		BorderPane.setAlignment(lblRemainingMoney, Pos.CENTER);
+		
+		// RIGHT section of the BorderPane layout
+		Button btnNext = new Button("Next");
+		btnNext.setFont(Font.font(MEDIUM_FONT));
+		root.setRight(btnNext);
+		BorderPane.setAlignment(btnNext, Pos.CENTER);
+		btnNext.setOnAction(event -> showPackingScenario());
+		
+		// Bottom section of the BorderPane layout
+		lblRoute = new Label("");
+		lblRoute.setFont(Font.font(MEDIUM_FONT));
+		lblRoute.setWrapText(true);
+		root.setBottom(lblRoute);
+		BorderPane.setAlignment(lblRoute, Pos.CENTER);
 		
 		Scene routeScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
@@ -302,6 +324,29 @@ public class CruiseStoryGame extends Application {
 	private void selectRoute(ActionEvent event) {
 		// The getSource() method returns the Object (RouteCard that was clicked) that generated this event
 		RouteCard temp = (RouteCard) event.getSource();	// cast to RouteCard object to access getValue() method from RouteCard class
+	
+		// Select this route card
+		temp.selectRouteCard();
+		
+		// Change remaining money left
+		boolean disabledCard = temp.getState();
+		if (!disabledCard) {
+			passenger.updateTotalMoney(temp.getChangeInMoney());
+			lblRemainingMoney.setText(passenger.showMoneyLeft());
+					
+			lblRoute.setText(temp.showResult());
+		}
+		
+		// Disable all cards so user can only select one route
+		for (int row = 0; row < routeGrid.length; row++) {
+			for (int col = 0; col < routeGrid[row].length; col++) {
+				routeGrid[row][col].disableCard();
+			}
+		}
+	}
+	
+	private void showPackingScenario() {
+		
 	}
 
 	public static void main(String[] args) {
