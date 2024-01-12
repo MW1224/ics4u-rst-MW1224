@@ -74,7 +74,7 @@ public class RouteCard extends Button {
 	public void selectRouteCard() {
 		if (!state) {
 			ImageView imgRoute = new ImageView(ROUTE_IMAGES[cardNum - 1]);
-			imgRoute.setFitHeight(CARD_DIMENSION);
+			imgRoute.setFitHeight(CARD_DIMENSION - 20);
 			imgRoute.setPreserveRatio(true);
 			setGraphic(imgRoute);
 			
