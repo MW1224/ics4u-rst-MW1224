@@ -47,7 +47,6 @@ public class RouteCard extends Button {
 		setText(String.valueOf(cardNum));
 		setContentDisplay(ContentDisplay.BOTTOM);
 		setPrefSize(CARD_DIMENSION, CARD_DIMENSION);
-		setWrapText(true);
 		
 		ImageView imgBlank = new ImageView(BLANK);
 		imgBlank.setFitHeight(CARD_DIMENSION - 20);
@@ -68,6 +67,10 @@ public class RouteCard extends Button {
 		state = true;
 	}
 	
+	public boolean getState() {
+		return state;
+	}
+	
 	public void selectRouteCard() {
 		if (!state) {
 			ImageView imgRoute = new ImageView(ROUTE_IMAGES[cardNum - 1]);
@@ -75,7 +78,7 @@ public class RouteCard extends Button {
 			imgRoute.setPreserveRatio(true);
 			setGraphic(imgRoute);
 			
-			setText(routeName + " ($" + cost + ")");
+			setText(routeName);
 		}
 	}
 	
