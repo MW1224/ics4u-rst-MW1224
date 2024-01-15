@@ -1,5 +1,7 @@
 package rst;
 
+import java.util.ArrayList;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -8,11 +10,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -347,9 +351,14 @@ public class CruiseStoryGame extends Application {
 	private void showPackingScenario() {
 		// Local constants
 		final int SCREEN_WIDTH = 790, SCREEN_HEIGHT = 900;
+		final int NUM_OF_ITEMS = PackingScenario.ITEMS.length;
+		final int LAST_ROW_ITEMS = 6;
+		final int FIRST_ROWS_ITEMS = (NUM_OF_ITEMS - LAST_ROW_ITEMS)/2;
 				
-		// Local variable
+		// Local variables
 		boolean noRouteSelected = true;
+		PackingScenario packingScenario = new PackingScenario();
+		Spinner[] numOfEachItem = new Spinner[NUM_OF_ITEMS];
 		
 		// Make sure user selected a route from previous scene
 		for (int row = 0; row < routeGrid.length; row++) {
@@ -366,8 +375,30 @@ public class CruiseStoryGame extends Application {
 		}
 		
 		// Root node for this JavaFX scene graph
-		
 		VBox root = new VBox();
+		
+		// Add title Label
+		Label lblTitle = new Label(packingScenario.toString());
+		lblTitle.setFont(Font.font(LARGE_FONT));
+		root.getChildren().add(lblTitle);
+		
+		// Add Label to show instructions
+		Label lblInstructions = new Label(PackingScenario.showWeightLimit() + "\n" + PackingScenario.showInstructions());
+		lblInstructions.setFont(Font.font(SMALL_FONT));
+		root.getChildren().add(lblInstructions);
+		
+		// Add HBox for 3 columns of activities and suitcase image showing its current weight
+		HBox hbxItems = new HBox();
+		VBox vbxRow1 = new VBox();
+		for (int i = 0; i < FIRST_ROWS_ITEMS; i++) {
+			Label lblActivity = new Label();
+		}
+		
+		VBox vbxRow2 = new VBox();
+		
+		VBox vbxRow3 = new VBox();
+		
+		hbxItems.getChildren().addAll(vbxRow1, vbxRow2, vbxRow3);
 		
 		Window routeWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
