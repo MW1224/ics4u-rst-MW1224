@@ -60,4 +60,8 @@ public class PackingScenario extends Scenario {
 			return "You didn't win or lose any money.";
 		}
 	}
+	
+	public String toString() {
+		return "Packing Game";
+	}
 }
