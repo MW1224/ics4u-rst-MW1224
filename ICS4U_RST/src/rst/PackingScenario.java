@@ -23,7 +23,7 @@ public class PackingScenario extends Scenario {
 				+ "toothbrush, other essentials).";
 	}
 	
-	public static String showWeight() {
+	public static String showWeightLimit() {
 		return "Weight Limit: " + WEIGHT_LIMIT + " lbs";
 	}
 	
