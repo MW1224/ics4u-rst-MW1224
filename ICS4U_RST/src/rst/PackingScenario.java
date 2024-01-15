@@ -16,6 +16,12 @@ public class PackingScenario extends Scenario {
 		suitcase = new Suitcase();
 	}
 	
+	public static String[] getItems() {
+		String[] items = new String[ITEMS.length];
+		
+		return items;
+	}
+	
 	public static String showInstructions() {
 		return "Below is a list of possible items to pack with their corresponding weights\n(per 1 item) in pounds. "
 				+ "Enter the number of each item you would like to\npack for your two-day trip. Your goal is to "
