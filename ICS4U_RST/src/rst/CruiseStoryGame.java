@@ -244,7 +244,7 @@ public class CruiseStoryGame extends Application {
 		final int TILE_DIMENSION = RouteCard.CARD_DIMENSION + 10;
 		final int SCREEN_WIDTH = 790, SCREEN_HEIGHT = 900;
 		
-		// Local variables
+		// Local variable
 		int cardNum = 1;
 		
 		// Root node for this JavaFX scene graph
@@ -309,14 +309,13 @@ public class CruiseStoryGame extends Application {
 		root.setBottom(lblRoute);
 		BorderPane.setAlignment(lblRoute, Pos.CENTER);
 		
-		Scene routeScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
-		
 		Window mainWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
 		if (mainWindow instanceof Stage) {
 			Stage myStage = (Stage) mainWindow;
 			myStage.setTitle("Cruise Route Random Selection");
-			myStage.setScene(routeScene);
+			myStage.setScene(mainScene);
 			myStage.show();
 		}
 	}
@@ -346,6 +345,39 @@ public class CruiseStoryGame extends Application {
 	}
 	
 	private void showPackingScenario() {
+		// Local constants
+		final int SCREEN_WIDTH = 790, SCREEN_HEIGHT = 900;
+				
+		// Local variable
+		boolean noRouteSelected = true;
+		
+		// Make sure user selected a route from previous scene
+		for (int row = 0; row < routeGrid.length; row++) {
+			for (int col = 0; col < routeGrid[row].length; col++) {
+				if (routeGrid[row][col].getState()) {	// if card is disabled
+					noRouteSelected = false;
+				}
+			}
+		}
+		
+		if (noRouteSelected) {
+			lblRoute.setText("Error: You must select a route before moving on");
+			return;
+		}
+		
+		// Root node for this JavaFX scene graph
+		
+		VBox root = new VBox();
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("Packing Scenario");
+			myStage.setScene(mainScene);
+			myStage.show();
+		}
 		
 	}
 
