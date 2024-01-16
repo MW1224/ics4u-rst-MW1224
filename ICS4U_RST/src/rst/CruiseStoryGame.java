@@ -3,6 +3,8 @@ package rst;
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,12 +13,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -41,13 +45,18 @@ public class CruiseStoryGame extends Application {
 	RouteCard[][] routeGrid;
 	
 	// Input/output UI controls
+	private Label lblTitle, lblResult, lblRemainingMoney;
 	// For Cruise Story Game main screen
-	private Label lblHighScore, lblErrorMessage;
+	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
 	private ChoiceBox<String> chcLoyaltyStatus;
 	private Scene mainScene;
 	// For Cruise Route Random Selection screen
-	private Label lblRemainingMoney, lblRoute;
+	private Label lblRoute;
+	// For Packing Scenario screen
+	private int[] itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];
+	private int itemIndex;
+	private Label lblWeight;
 	
 	/**
 	 * Overridden method to handle what happens when application stops.
@@ -78,7 +87,7 @@ public class CruiseStoryGame extends Application {
 		passenger = new Passenger(highScore);
 		
 		// Add title Label
-		Label lblTitle = new Label("Welcome to the cruise story game!");
+		lblTitle = new Label("Welcome to the cruise story game!");
 		lblTitle.setFont(Font.font(XL_FONT));
 		root.getChildren().add(lblTitle);
 		
@@ -203,9 +212,9 @@ public class CruiseStoryGame extends Application {
 		root.getChildren().add(gridPassengerInfo);
 		
 		// Add label in case of error message to bottom of VBox root
-		lblErrorMessage = new Label("");
-		lblErrorMessage.setFont(Font.font(SMALL_FONT));
-		root.getChildren().add(lblErrorMessage);
+		lblResult = new Label("");
+		lblResult.setFont(Font.font(SMALL_FONT));
+		root.getChildren().add(lblResult);
 		
 		// Create scene with root VBox
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -229,7 +238,7 @@ public class CruiseStoryGame extends Application {
 		loyaltyStatus = chcLoyaltyStatus.getValue();
 		
 		if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || loyaltyStatus == null) {
-			lblErrorMessage.setText("Please enter information in all fields! (no empty boxes)");
+			lblResult.setText("Please enter information in all fields! (no empty boxes)");
 			return;
 		}
 		
@@ -258,8 +267,7 @@ public class CruiseStoryGame extends Application {
 		// TOP section of the BorderPane layout
 		VBox vbxTop = new VBox();
 		// Label for title
-		Label lblTitle = new Label("Cruise Route Random Selection");
-		lblTitle.setFont(Font.font(XL_FONT));
+		lblTitle.setText("Cruise Route Random Selection");
 		// Label for instructions
 		Label lblInstructions = new Label(RouteCard.showInstructions());
 		lblInstructions.setFont(Font.font(MEDIUM_FONT));
@@ -350,15 +358,13 @@ public class CruiseStoryGame extends Application {
 	
 	private void showPackingScenario() {
 		// Local constants
-		final int SCREEN_WIDTH = 790, SCREEN_HEIGHT = 900;
-		final int NUM_OF_ITEMS = PackingScenario.ITEMS.length;
-		final int LAST_ROW_ITEMS = 6;
-		final int FIRST_ROWS_ITEMS = (NUM_OF_ITEMS - LAST_ROW_ITEMS)/2;
+		final int SCREEN_WIDTH = 1200, SCREEN_HEIGHT = 900;
+		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 5)/2;
+		final String[] ITEMS = PackingScenario.getItems();
 				
 		// Local variables
 		boolean noRouteSelected = true;
 		PackingScenario packingScenario = new PackingScenario();
-		Spinner[] numOfEachItem = new Spinner[NUM_OF_ITEMS];
 		
 		// Make sure user selected a route from previous scene
 		for (int row = 0; row < routeGrid.length; row++) {
@@ -375,10 +381,10 @@ public class CruiseStoryGame extends Application {
 		}
 		
 		// Root node for this JavaFX scene graph
-		VBox root = new VBox();
+		VBox root = new VBox(GAP);
 		
 		// Add title Label
-		Label lblTitle = new Label(packingScenario.toString());
+		lblTitle.setText(packingScenario.toString());
 		lblTitle.setFont(Font.font(LARGE_FONT));
 		root.getChildren().add(lblTitle);
 		
@@ -388,17 +394,70 @@ public class CruiseStoryGame extends Application {
 		root.getChildren().add(lblInstructions);
 		
 		// Add HBox for 3 columns of activities and suitcase image showing its current weight
-		HBox hbxItems = new HBox();
-		VBox vbxRow1 = new VBox();
-		for (int i = 0; i < FIRST_ROWS_ITEMS; i++) {
-			Label lblActivity = new Label();
+		HBox hbxItems = new HBox(GAP * 2);
+		VBox vbxCol1 = new VBox(), vbxCol2 = new VBox(), vbxCol3 = new VBox();
+		
+		ArrayList<Spinner<Integer>> spnItemQuantities = new ArrayList<Spinner<Integer>>();
+		
+		itemIndex = 0;
+		while (itemIndex < PackingScenario.NUM_OF_ITEMS) {
+			HBox hbxRow = new HBox(GAP);
+			SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+			valueFactory.setValue(0);
+			
+			Label lblActivity = new Label(ITEMS[itemIndex] + "  ");
+			lblActivity.setFont(Font.font(SMALL_FONT));
+			
+			spnItemQuantities.add(itemIndex, new Spinner<Integer>());
+			Spinner<Integer> spnItemQuantity = spnItemQuantities.get(itemIndex);
+			
+			spnItemQuantity.setValueFactory(valueFactory);
+			itemQuantities[itemIndex] = spnItemQuantity.getValue();
+			
+			spnItemQuantity.valueProperty().addListener(new ChangeListener<Integer>() {
+				public void changed(ObservableValue<? extends Integer> ov, Integer old_val, Integer new_val) {
+					itemQuantities[spnItemQuantities.indexOf(spnItemQuantity)] = spnItemQuantity.getValue();
+				}
+			});
+			
+			hbxRow.getChildren().addAll(lblActivity, spnItemQuantity);
+			
+			if (itemIndex < FIRST_ROWS_ITEMS) {
+				vbxCol1.getChildren().add(hbxRow);
+			} else if (itemIndex >= FIRST_ROWS_ITEMS && itemIndex < FIRST_ROWS_ITEMS * 2) {
+				vbxCol2.getChildren().add(hbxRow);
+			} else {
+				vbxCol3.getChildren().add(hbxRow);
+			}
+			
+			itemIndex++;	// increment index
 		}
 		
-		VBox vbxRow2 = new VBox();
+		// Suitcase output in the third VBox (3rd column)
+		StackPane stackSuitcase = new StackPane();
+		ImageView imgSuitcase = new ImageView(new Image(getClass().getResource("/images/suitcase.png").toString()));
+		lblWeight = new Label();
 		
-		VBox vbxRow3 = new VBox();
+		stackSuitcase.getChildren().addAll(imgSuitcase, lblWeight);
+		stackSuitcase.setAlignment(Pos.CENTER);
+		vbxCol3.getChildren().add(stackSuitcase);
 		
-		hbxItems.getChildren().addAll(vbxRow1, vbxRow2, vbxRow3);
+		hbxItems.getChildren().addAll(vbxCol1, vbxCol2, vbxCol3);
+		hbxItems.setAlignment(Pos.CENTER);
+		root.getChildren().add(hbxItems);
+		
+		// Button to check weight
+		Button btnFinishPacking = new Button("Finish Packing");
+		btnFinishPacking.setFont(Font.font(SMALL_FONT));
+		
+		// Label to output result
+		lblResult.setText("");
+		
+		// Button to move to next scene
+		Button btnStartCruise = new Button("Start Cruise Trip!");
+		btnStartCruise.setFont(Font.font(SMALL_FONT));
+		
+		root.getChildren().addAll(btnFinishPacking, lblResult, lblRemainingMoney, btnStartCruise);
 		
 		Window routeWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
