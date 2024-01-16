@@ -3,7 +3,7 @@ package rst;
 public class PackingScenario extends Scenario {
 	
 	public static final int WEIGHT_LIMIT = 40;
-	public static final int NUM_OF_ITEMS = 36;
+	public static final int NUM_OF_ITEMS = 35;
 	
 	private Suitcase suitcase;
 	
