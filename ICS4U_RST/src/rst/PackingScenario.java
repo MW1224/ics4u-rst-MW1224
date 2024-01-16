@@ -18,7 +18,9 @@ public class PackingScenario extends Scenario {
 	
 	public static String[] getItems() {
 		String[] items = new String[ITEMS.length];
-		
+		for (int i = 0; i < items.length; i++) {
+			items[i] = ITEMS[i] + " (" + Suitcase.WEIGHTS[i] + "):";
+		}
 		return items;
 	}
 	
