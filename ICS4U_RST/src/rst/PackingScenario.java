@@ -3,6 +3,7 @@ package rst;
 public class PackingScenario extends Scenario {
 	
 	public static final int WEIGHT_LIMIT = 40;
+	public static final int NUM_OF_ITEMS = 36;
 	
 	private Suitcase suitcase;
 	
@@ -17,8 +18,8 @@ public class PackingScenario extends Scenario {
 				"Bandaid Boxes", "Computers", "Tablets/iPads", "Portable Chargers", "Cameras", "Headphones",
 				"Earphones", "Sunglasses", "Travel Games", "Snorkels", "Watches", "Swimsuits", "Suit Sets", "Towels",
 				"Water Bottles", "Hair Accessories"};
-		String[] itemsWithWeights = new String[ITEMS.length];
-		for (int i = 0; i < itemsWithWeights.length; i++) {
+		String[] itemsWithWeights = new String[NUM_OF_ITEMS];
+		for (int i = 0; i < NUM_OF_ITEMS; i++) {
 			itemsWithWeights[i] = ITEMS[i] + " (" + Suitcase.WEIGHTS[i] + "):";
 		}
 		return itemsWithWeights;
