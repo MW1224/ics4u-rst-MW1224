@@ -26,9 +26,9 @@ public class PackingScenario extends Scenario {
 	}
 	
 	public static String showInstructions() {
-		return "Below is a list of possible items to pack with their corresponding weights\n(per 1 item) in pounds. "
-				+ "Enter the number of each item you would like to\npack for your two-day trip. Your goal is to "
-				+ "keep your suitcase below the\nweight limit. Each suitcase starts with 15 lbs (suitcase itself, "
+		return "Below is a list of possible items to pack with their corresponding weights (per 1 item) in pounds. "
+				+ "Enter the number of each item you would like to pack for your two-day trip. Your goal is to "
+				+ "keep your suitcase below the weight limit. Each suitcase starts with 15 lbs (suitcase itself, "
 				+ "toothbrush, other essentials).";
 	}
 	
