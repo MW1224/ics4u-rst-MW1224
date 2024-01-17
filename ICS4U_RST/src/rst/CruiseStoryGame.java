@@ -38,7 +38,7 @@ import javafx.stage.Window;
 public class CruiseStoryGame extends Application {
 	
 	// Global constants
-	private static final int GAP = 10;
+	private static final int GAP = 10, SMALL_GAP = 3;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	
 	// References for global objects
@@ -49,7 +49,7 @@ public class CruiseStoryGame extends Application {
 	private boolean eventDone;
 	
 	// Input/output UI controls
-	private Label lblTitle, lblResult, lblRemainingMoney, lblErrorMessage;
+	private Label lblTitle, lblInstructions, lblResult, lblRemainingMoney, lblErrorMessage;
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
@@ -92,7 +92,7 @@ public class CruiseStoryGame extends Application {
 		passenger = new Passenger(highScore);
 		
 		// Add title Label
-		lblTitle = new Label("Welcome to the cruise story game!");
+		lblTitle = new Label("Welcome to the Cruise Story Game!");
 		lblTitle.setFont(Font.font(XL_FONT));
 		root.getChildren().add(lblTitle);
 		
@@ -271,16 +271,16 @@ public class CruiseStoryGame extends Application {
 		
 		// TOP section of the BorderPane layout
 		VBox vbxTop = new VBox();
+		vbxTop.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		vbxTop.setAlignment(Pos.CENTER);
 		// Label for title
 		lblTitle.setText("Cruise Route Random Selection");
 		// Label for instructions
-		Label lblInstructions = new Label(RouteCard.showInstructions());
+		lblInstructions = new Label(RouteCard.showInstructions());
 		lblInstructions.setFont(Font.font(MEDIUM_FONT));
 		lblInstructions.setWrapText(true);
-		lblInstructions.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		// Add to parent node VBox
 		vbxTop.getChildren().addAll(lblTitle, lblInstructions);
-		vbxTop.setAlignment(Pos.CENTER);
 		root.setTop(vbxTop);
 		
 		// CENTER section of the BorderPane layout
@@ -363,8 +363,8 @@ public class CruiseStoryGame extends Application {
 	
 	private void showPackingScenario() {
 		// Local constants
-		final int SCREEN_WIDTH = 1150, SCREEN_HEIGHT = 900;
-		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 5)/2;
+		final int SCREEN_WIDTH = 1200, SCREEN_HEIGHT = 900;
+		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 7)/2;
 		final String[] ITEMS = PackingScenario.getItems();
 				
 		// Local variables
@@ -391,21 +391,24 @@ public class CruiseStoryGame extends Application {
 		// Root node for this JavaFX scene graph
 		VBox root = new VBox(GAP);
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		root.setAlignment(Pos.CENTER);
 		
 		// Add title Label
 		lblTitle.setText(packingScenario.toString());
-		lblTitle.setFont(Font.font(LARGE_FONT));
 		root.getChildren().add(lblTitle);
 		
+		// Label to show weight limit
+		Label lblWeightLimit = new Label(PackingScenario.showWeightLimit());
+		lblWeightLimit.setFont(Font.font(MEDIUM_FONT));
+		
 		// Add Label to show instructions
-		Label lblInstructions = new Label(PackingScenario.showWeightLimit() + "\n" + PackingScenario.showInstructions());
-		lblInstructions.setFont(Font.font(SMALL_FONT));
-		lblInstructions.setWrapText(true);
-		root.getChildren().add(lblInstructions);
+		lblInstructions.setText(PackingScenario.showInstructions());
+		lblInstructions.setFont(Font.font(MEDIUM_FONT));
+		root.getChildren().addAll(lblWeightLimit, lblInstructions);
 		
 		// Add HBox for 3 columns of activities and suitcase image showing its current weight
 		HBox hbxItems = new HBox(GAP * 2);
-		VBox vbxCol1 = new VBox(), vbxCol2 = new VBox(), vbxCol3 = new VBox();
+		VBox vbxCol1 = new VBox(SMALL_GAP), vbxCol2 = new VBox(SMALL_GAP), vbxCol3 = new VBox(SMALL_GAP);
 		
 		ArrayList<Spinner<Integer>> spnItemQuantities = new ArrayList<Spinner<Integer>>();
 		
@@ -446,6 +449,8 @@ public class CruiseStoryGame extends Application {
 		// Suitcase output in the third VBox (3rd column)
 		StackPane stackSuitcase = new StackPane();
 		ImageView imgSuitcase = new ImageView(new Image(getClass().getResource("/images/suitcase.png").toString()));
+		imgSuitcase.setFitHeight(210);
+		imgSuitcase.setPreserveRatio(true);
 		lblWeight = new Label();
 		lblWeight.setFont(Font.font(LARGE_FONT));
 		lblWeight.setPrefWidth(90);
@@ -464,6 +469,9 @@ public class CruiseStoryGame extends Application {
 		Button btnFinishPacking = new Button("Finish Packing");
 		btnFinishPacking.setFont(Font.font(SMALL_FONT));
 		btnFinishPacking.setOnAction(event -> checkWeight());
+		
+		// Adjust width of remaining money label
+		lblRemainingMoney.setPrefWidth(200);
 		
 		// Label to output result
 		lblResult.setText("");
