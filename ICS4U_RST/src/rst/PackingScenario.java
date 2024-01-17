@@ -43,13 +43,13 @@ public class PackingScenario extends Scenario {
 		
 		suitcase.calculateWeight(numOfEachItem);
 		
-		double weight = Math.round(suitcase.getWeight() * 100)/100;
+		double weight = suitcase.getWeight();
 		if (weight > WEIGHT_LIMIT) {
 			changeInMoney = FEE;
-			result = "Oh no! Your suitcase is " + (weight - WEIGHT_LIMIT) + " lbs over the weight limit.";
+			result = "Oh no! Your suitcase is " + ((double)Math.round((weight - WEIGHT_LIMIT) * 100)/100) + " lbs over the weight limit.";
 		} else if (weight < WEIGHT_LIMIT) {
 			changeInMoney = BONUS;
-			result = "Good job! Your suitcase is " + (WEIGHT_LIMIT - weight) + " lbs under the weight limit.";
+			result = "Good job! Your suitcase is " + ((double)Math.round((WEIGHT_LIMIT - weight) * 100)/100) + " lbs under the weight limit.";
 		} else {
 			result = "Your suitcase is right on the weight limit of " + WEIGHT_LIMIT + " lbs.";
 		}
@@ -58,7 +58,7 @@ public class PackingScenario extends Scenario {
 	}
 	
 	public double getWeight() {
-		return Math.round(suitcase.getWeight() * 100)/100;
+		return (double)Math.round(suitcase.getWeight() * 100)/100;
 	}
 	
 	public String showChangeInMoney() {
