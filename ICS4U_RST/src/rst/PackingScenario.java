@@ -43,7 +43,7 @@ public class PackingScenario extends Scenario {
 		
 		suitcase.calculateWeight(numOfEachItem);
 		
-		double weight = suitcase.getWeight();
+		double weight = Math.round(suitcase.getWeight() * 100)/100;
 		if (weight > WEIGHT_LIMIT) {
 			changeInMoney = FEE;
 			result = "Oh no! Your suitcase is " + (weight - WEIGHT_LIMIT) + " lbs over the weight limit.";
@@ -58,7 +58,7 @@ public class PackingScenario extends Scenario {
 	}
 	
 	public double getWeight() {
-		return suitcase.getWeight();
+		return Math.round(suitcase.getWeight() * 100)/100;
 	}
 	
 	public String showChangeInMoney() {
