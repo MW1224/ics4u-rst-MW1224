@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -41,11 +42,14 @@ public class CruiseStoryGame extends Application {
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	
 	// References for global objects
-	Passenger passenger;
-	RouteCard[][] routeGrid;
+	private Passenger passenger;
+	private RouteCard[][] routeGrid;
+	
+	// Global variables
+	private boolean eventDone;
 	
 	// Input/output UI controls
-	private Label lblTitle, lblResult, lblRemainingMoney;
+	private Label lblTitle, lblResult, lblRemainingMoney, lblErrorMessage;
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
@@ -54,6 +58,7 @@ public class CruiseStoryGame extends Application {
 	// For Cruise Route Random Selection screen
 	private Label lblRoute;
 	// For Packing Scenario screen
+	private PackingScenario packingScenario;
 	private int[] itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];
 	private int itemIndex;
 	private Label lblWeight;
@@ -358,13 +363,13 @@ public class CruiseStoryGame extends Application {
 	
 	private void showPackingScenario() {
 		// Local constants
-		final int SCREEN_WIDTH = 1200, SCREEN_HEIGHT = 900;
+		final int SCREEN_WIDTH = 1150, SCREEN_HEIGHT = 900;
 		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 5)/2;
 		final String[] ITEMS = PackingScenario.getItems();
 				
 		// Local variables
 		boolean noRouteSelected = true;
-		PackingScenario packingScenario = new PackingScenario();
+		packingScenario = new PackingScenario();
 		
 		// Make sure user selected a route from previous scene
 		for (int row = 0; row < routeGrid.length; row++) {
@@ -375,6 +380,9 @@ public class CruiseStoryGame extends Application {
 			}
 		}
 		
+		// User hasn't clicked "Finish Packing" button yet
+		eventDone = false;
+		
 		if (noRouteSelected) {
 			lblRoute.setText("Error: You must select a route before moving on");
 			return;
@@ -382,6 +390,7 @@ public class CruiseStoryGame extends Application {
 		
 		// Root node for this JavaFX scene graph
 		VBox root = new VBox(GAP);
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
 		// Add title Label
 		lblTitle.setText(packingScenario.toString());
@@ -391,6 +400,7 @@ public class CruiseStoryGame extends Application {
 		// Add Label to show instructions
 		Label lblInstructions = new Label(PackingScenario.showWeightLimit() + "\n" + PackingScenario.showInstructions());
 		lblInstructions.setFont(Font.font(SMALL_FONT));
+		lblInstructions.setWrapText(true);
 		root.getChildren().add(lblInstructions);
 		
 		// Add HBox for 3 columns of activities and suitcase image showing its current weight
@@ -437,6 +447,10 @@ public class CruiseStoryGame extends Application {
 		StackPane stackSuitcase = new StackPane();
 		ImageView imgSuitcase = new ImageView(new Image(getClass().getResource("/images/suitcase.png").toString()));
 		lblWeight = new Label();
+		lblWeight.setFont(Font.font(LARGE_FONT));
+		lblWeight.setPrefWidth(90);
+		lblWeight.setTextFill(Color.LIGHTCYAN);
+		lblWeight.setWrapText(true);
 		
 		stackSuitcase.getChildren().addAll(imgSuitcase, lblWeight);
 		stackSuitcase.setAlignment(Pos.CENTER);
@@ -449,15 +463,21 @@ public class CruiseStoryGame extends Application {
 		// Button to check weight
 		Button btnFinishPacking = new Button("Finish Packing");
 		btnFinishPacking.setFont(Font.font(SMALL_FONT));
+		btnFinishPacking.setOnAction(event -> checkWeight());
 		
 		// Label to output result
 		lblResult.setText("");
 		
+		// Label to output any possible error messages later
+		lblErrorMessage = new Label("");
+		lblErrorMessage.setFont(Font.font(SMALL_FONT));
+		
 		// Button to move to next scene
 		Button btnStartCruise = new Button("Start Cruise Trip!");
 		btnStartCruise.setFont(Font.font(SMALL_FONT));
+		btnStartCruise.setOnAction(event -> showMiniGames());
 		
-		root.getChildren().addAll(btnFinishPacking, lblResult, lblRemainingMoney, btnStartCruise);
+		root.getChildren().addAll(btnFinishPacking, lblResult, lblRemainingMoney, lblErrorMessage, btnStartCruise);
 		
 		Window routeWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -468,7 +488,31 @@ public class CruiseStoryGame extends Application {
 			myStage.setScene(mainScene);
 			myStage.show();
 		}
+	}
+	
+	private void checkWeight() {
+		// If user already finished packing
+		if (eventDone) {
+			lblErrorMessage.setText("You've already finished packing.");
+			return;
+		}
 		
+		lblErrorMessage.setText("");
+		
+		lblResult.setText(packingScenario.checkWeight(itemQuantities) + "\n" + packingScenario.showChangeInMoney());
+		lblWeight.setText("Final weight: " + packingScenario.getWeight() + " lbs");
+		
+		passenger.updateTotalMoney(packingScenario.getChangeInMoney());
+		lblRemainingMoney.setText(passenger.showMoneyLeft());
+		
+		eventDone = true;
+	}
+	
+	private void showMiniGames() {
+		if (!eventDone) {
+			lblErrorMessage.setText("Please finish packing before moving on.");
+			return;
+		}
 	}
 
 	public static void main(String[] args) {
