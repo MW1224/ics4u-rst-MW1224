@@ -4,12 +4,13 @@ public class PackingScenario extends Scenario {
 	
 	public static final int WEIGHT_LIMIT = 40;
 	public static final int NUM_OF_ITEMS = 35;
-	private static final int FEE = -10, BONUS = 10;
+	private static final int FEE = -15, BONUS = 10, MINOR_FEE = -5;
 	
 	private Suitcase suitcase;
 	
 	public PackingScenario() {
 		suitcase = new Suitcase();
+		changeInMoney = 0;
 	}
 	
 	public static String[] getItems() {
@@ -50,7 +51,7 @@ public class PackingScenario extends Scenario {
 			changeInMoney = BONUS;
 			result = "Good job! Your suitcase is " + (WEIGHT_LIMIT - weight) + " lbs under the weight limit.";
 		} else {
-			changeInMoney = 0;
+			changeInMoney = MINOR_FEE;
 			result = "Your suitcase is right on the weight limit of " + WEIGHT_LIMIT + " lbs.";
 		}
 		
@@ -67,7 +68,7 @@ public class PackingScenario extends Scenario {
 		} else if (changeInMoney > 0) {
 			return "You got a $" + BONUS + " bonus!";
 		} else {
-			return "You didn't win or lose any money.";
+			return "You lost just $" + (-1 * MINOR_FEE) + ".";
 		}
 	}
 	
