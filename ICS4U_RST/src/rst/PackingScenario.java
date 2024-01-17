@@ -4,6 +4,7 @@ public class PackingScenario extends Scenario {
 	
 	public static final int WEIGHT_LIMIT = 40;
 	public static final int NUM_OF_ITEMS = 35;
+	private static final int FEE = -10, BONUS = 10;
 	
 	private Suitcase suitcase;
 	
@@ -43,10 +44,10 @@ public class PackingScenario extends Scenario {
 		
 		double weight = suitcase.getWeight();
 		if (weight > WEIGHT_LIMIT) {
-			changeInMoney = -10;
+			changeInMoney = FEE;
 			result = "Oh no! Your suitcase is " + (weight - WEIGHT_LIMIT) + " lbs over the weight limit.";
 		} else if (weight < WEIGHT_LIMIT) {
-			changeInMoney = 10;
+			changeInMoney = BONUS;
 			result = "Good job! Your suitcase is " + (WEIGHT_LIMIT - weight) + " lbs under the weight limit.";
 		} else {
 			changeInMoney = 0;
@@ -62,9 +63,9 @@ public class PackingScenario extends Scenario {
 	
 	public String showChangeInMoney() {
 		if (changeInMoney < 0) {
-			return "You lost $10!";
+			return "You lost $" + (-1 * FEE) + "!";
 		} else if (changeInMoney > 0) {
-			return "You got a $10 bonus!";
+			return "You got a $" + BONUS + " bonus!";
 		} else {
 			return "You didn't win or lose any money.";
 		}
