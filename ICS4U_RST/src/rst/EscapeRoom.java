@@ -8,10 +8,12 @@ public class EscapeRoom extends MiniGame {
 	public static final int [] LOCK_NUMS = {2, 1, 3, 5, 4};
 	private static final int[] FIRST_FIVE_LOCK_COMBOS = {16, 6, 10210, 312, 2610};
 	private static final String[] LOCK_CLUES = {"Passenger decks on Oasis of the Seas", "Ignore the pink and green beach umbrellas",
-			"Oasis of the Seas (it's not the rows...)", "Only formal nights", "'Life is better on a cruise' - I,A,S", "Height of pyramid"};
+			"Oasis of the Seas (it's not the rows...)", "Only formal nights (left -> right; top -> bottom)", "'Life is better on a"
+			+ "cruise' - I,A,S", "Height of pyramid"};
 	private static final String[] LOCK_HINTS = {"Lock 1 - Do a quick Google search!", "Lock 2 - Number of blue beach umbrellas.",
 			"Lock 3 - Number of times Oasis OTS appears in each column.", "Lock 4  - Number of times each letter (i/a/s) appears.",
-			"Lock 5 - Night NUMBERS of formal nights in increasing order", "Pyramid's number of rows."};
+			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom - each night # increments by 1",
+			"Pyramid's number of rows."};
 	
 	private ArrayList<Lock> allLocks;
 	private ArrayList<String> pyramidOutput;
