@@ -41,6 +41,7 @@ public class CruiseStoryGame extends Application {
 	
 	// Global constants
 	private static final int GAP = 10, SMALL_GAP = 3;
+	private static final int SCREEN_HEIGHT = 900;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	
 	// Input/output UI controls & global variables
@@ -58,11 +59,12 @@ public class CruiseStoryGame extends Application {
 	private Label lblRoute;
 	// For Packing Scenario screen
 	private PackingScenario packingScenario;
-	private int[] itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];
+	private int[] itemQuantities;
 	private int itemIndex;
 	private Label lblWeight;
 	// For Royal Escape Room Mini Game screen
 	private EscapeRoom royalEscapeRoom;
+	private int lockIndex = 0;
 	// For Word Unscramble Mini Game screen
 	private WordUnscramble wordUnscrambleGame;
 	
@@ -83,7 +85,7 @@ public class CruiseStoryGame extends Application {
 		// Local constants
 		final int TILE_HEIGHT = 185, TILE_WIDTH = 200;
 		final int IMG_HEIGHT = 175;
-		final int SCREEN_WIDTH = 1100, SCREEN_HEIGHT = 900;
+		final int SCREEN_WIDTH = 1100;
 		
 		// Set layout
 		VBox root = new VBox(GAP);
@@ -263,7 +265,7 @@ public class CruiseStoryGame extends Application {
 		// Local constants
 		final int GRID_DIMENSION = 4;
 		final int TILE_DIMENSION = RouteCard.CARD_DIMENSION + 10;
-		final int SCREEN_WIDTH = 790, SCREEN_HEIGHT = 900;
+		final int SCREEN_WIDTH = 790;
 		
 		// Local variable
 		int cardNum = 1;
@@ -366,7 +368,7 @@ public class CruiseStoryGame extends Application {
 	
 	private void showPackingScenarioScreen() {
 		// Local constants
-		final int SCREEN_WIDTH = 1200, SCREEN_HEIGHT = 900;
+		final int SCREEN_WIDTH = 1200;
 		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 7)/2;
 		final String[] ITEMS = PackingScenario.getItems();
 				
@@ -414,6 +416,7 @@ public class CruiseStoryGame extends Application {
 		VBox vbxCol1 = new VBox(SMALL_GAP), vbxCol2 = new VBox(SMALL_GAP), vbxCol3 = new VBox(SMALL_GAP);
 		
 		ArrayList<Spinner<Integer>> spnItemQuantities = new ArrayList<Spinner<Integer>>();
+		itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];
 		
 		itemIndex = 0;
 		while (itemIndex < PackingScenario.NUM_OF_ITEMS) {
@@ -520,6 +523,9 @@ public class CruiseStoryGame extends Application {
 	}
 	
 	private void showMiniGamesScreen() {
+		// Local constants
+		final int SCREEN_WIDTH = 400, GAMES_SCREEN_HEIGHT = 400;
+		
 		if (!eventDone) {
 			lblErrorMessage.setText("Please finish activity before moving on.");
 			return;
@@ -534,6 +540,7 @@ public class CruiseStoryGame extends Application {
 		lblTitle.setText("Day " + dayNumber);
 		// Label for instructions
 		lblInstructions.setText("Select a mini game:");
+		lblInstructions.setFont(Font.font(LARGE_FONT));
 		
 		root.getChildren().addAll(lblTitle, lblInstructions);
 		
@@ -543,13 +550,90 @@ public class CruiseStoryGame extends Application {
 		
 		for (String miniGame : miniGamesLeft) {
 			RadioButton radMiniGame = new RadioButton(miniGame);
+			radMiniGame.setFont(Font.font(LARGE_FONT));
 			radMiniGame.setToggleGroup(tgMiniGames);
 			root.getChildren().add(radMiniGame);
 			radMiniGame.setOnAction(event -> playMiniGame(event));
 		}
 		
 		Window routeWindow = mainScene.getWindow();
-		mainScene = new Scene(root);
+		mainScene = new Scene(root, SCREEN_WIDTH, GAMES_SCREEN_HEIGHT);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("Day " + dayNumber + " - Mini Games");
+			myStage.setScene(mainScene);
+			myStage.show();
+			dayNumber++;
+		}
+	}
+	
+	private void playMiniGame(ActionEvent event) {
+		RadioButton temp = (RadioButton) event.getSource();
+		
+		if (temp.getText().equals(EscapeRoom.NAME)) {
+			showEscapeRoomScreen();
+		} else if (temp.getText().equals(WordUnscramble.NAME)) {
+			showWordUnscrambleScreen();
+		}
+	}
+	
+	private void showEscapeRoomScreen() {
+		
+		// Local constant
+		final int SCREEN_WIDTH = 1000; 
+		final int IMG_HEIGHT = 90;
+		final int LOCK_NUM1 = EscapeRoom.LOCK_NUMS[lockIndex];
+		
+		// Local object
+		royalEscapeRoom = new EscapeRoom();
+		
+		VBox root = new VBox(GAP);
+		root.setAlignment(Pos.CENTER);
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		
+		// Label for title
+		lblTitle.setText(EscapeRoom.NAME);
+
+		// Section for escape room's instructions & images
+		HBox hbxInstructions = new HBox(GAP);
+		
+		// ImageView for escape room image
+		ImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
+		imgEscapeRoom.setFitHeight(IMG_HEIGHT);
+		imgEscapeRoom.setPreserveRatio(true);
+		ImageView imgLifeBoat = new ImageView(new Image(getClass().getResource("/images/lifeBoat.png").toString()));
+		imgLifeBoat.setFitHeight(IMG_HEIGHT);
+		imgLifeBoat.setPreserveRatio(true);
+		
+		// Label for instructions
+		lblInstructions.setText(EscapeRoom.showInstructions());
+		lblInstructions.setFont(Font.font(SMALL_FONT));
+		
+		hbxInstructions.getChildren().addAll(imgEscapeRoom, lblInstructions, imgLifeBoat);
+		root.getChildren().addAll(lblTitle, hbxInstructions);
+		
+		// Label for clue
+		Label lblClue = new Label(royalEscapeRoom.getLockClue(LOCK_NUM1));
+		lblClue.setFont(Font.font(MEDIUM_FONT));
+		lblClue.setWrapText(true);
+		
+		// Show visual
+		GridPane gridVisual = new GridPane();
+		String [][] visual = royalEscapeRoom.getLockVisual(LOCK_NUM1);
+		for (int row = 0; row < visual.length; row++) {
+			for (int col = 0; col < visual[row].length; col++) {
+				ImageView imgVisual = new ImageView(new Image(getClass().getResource("/images/" + visual[row][col] + ".png").toString()));
+				imgVisual.setFitHeight(IMG_HEIGHT);
+				imgVisual.setPreserveRatio(true);
+				gridVisual.add(imgVisual, col, row);
+			}
+		}
+		
+		root.getChildren().addAll(lblClue, gridVisual);
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
 		if (routeWindow instanceof Stage) {
 			Stage myStage = (Stage) routeWindow;
@@ -559,7 +643,7 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
-	private void playMiniGame(ActionEvent event) {
+	private void showWordUnscrambleScreen() {
 		
 	}
 	
