@@ -3,6 +3,7 @@ package rst;
 import java.util.ArrayList;
 
 public class WordUnscramble extends MiniGame {
+	public static final String NAME = "Word Unscramble";
 	public static final int START_BONUS = 0, CORRECT_BONUS = 4, INCORRECT_FEE = -6, BLANK_FEE = -10;
 	public static final int NUM_OF_POSSIBLE_WORDS = 22;
 	public static final String WORD = "ocean";
@@ -65,9 +66,5 @@ public class WordUnscramble extends MiniGame {
 			}
 		}
 		return correctWords;
-	}
-	
-	public String toString() {
-		return "Word Unscramble";
 	}
 }
