@@ -31,8 +31,8 @@ public class Passenger {
 		totalMoney = START_MONEY;
 		highScore = 0;
 		winStatus = true;
-		miniGamesLeft.add("Royal Escape Room");
-		miniGamesLeft.add("Word Unscramble");
+		miniGamesLeft.add(EscapeRoom.NAME);
+		miniGamesLeft.add(WordUnscramble.NAME);
 	}
 	
 	/**
@@ -50,8 +50,8 @@ public class Passenger {
 		totalMoney = START_MONEY;
 		highScore = hScore;
 		winStatus = true;
-		miniGamesLeft.add("Royal Escape Room");
-		miniGamesLeft.add("Word Unscramble");
+		miniGamesLeft.add(EscapeRoom.NAME);
+		miniGamesLeft.add(WordUnscramble.NAME);
 	}
 	
 	/**
@@ -69,8 +69,8 @@ public class Passenger {
 		totalMoney = START_MONEY;
 		highScore = hScore;
 		winStatus = true;
-		miniGamesLeft.add("Royal Escape Room");
-		miniGamesLeft.add("Word Unscramble");
+		miniGamesLeft.add(EscapeRoom.NAME);
+		miniGamesLeft.add(WordUnscramble.NAME);
 	}
 	
 	public static String showGameIntro() {
