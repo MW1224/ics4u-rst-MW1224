@@ -3,6 +3,7 @@ package rst;
 import java.util.ArrayList;
 
 public class EscapeRoom extends MiniGame {
+	public static final String NAME = "Royal Escape Room";
 	public static final int START_BONUS = 20, INCORRECT_FEE = 6, HINT_FEE = 3;
 	private static final int[] FIRST_FIVE_LOCK_COMBOS = {16, 6, 10210, 312, 2610};
 	private static final String[] LOCK_CLUES = {"Passenger decks on Oasis of the Seas", "Ignore the pink and green beach umbrellas",
@@ -163,9 +164,5 @@ public class EscapeRoom extends MiniGame {
 		} else {
 			return null;
 		}
-	}
-	
-	public String toString() {
-		return "Royal Escape Room";
 	}
 }
