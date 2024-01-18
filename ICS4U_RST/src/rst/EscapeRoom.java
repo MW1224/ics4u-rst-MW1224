@@ -26,9 +26,9 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public static String showInstructions() {
-		return "You are on a ship that is about to sink. You must find\nyour life boat to escape and survive. However, it is\nlocked, and in"
-				+ " order to find that lock combination,\nyou first need to unlock 5 other locks.\nYou start with $" + START_BONUS + " bonus"
-				+ " money. For each incorrect guess,\n$" + INCORRECT_FEE + " gets subtracted from the bonus. For each hint,\n$"
+		return "You are on a ship that is about to sink. You must find your life boat to escape and survive. However, it is locked, and in"
+				+ " order to find that lock combination, you first need to unlock 5 other locks. You start with $" + START_BONUS + " bonus"
+				+ " money. For each incorrect guess, $" + INCORRECT_FEE + " gets subtracted from the bonus. For each hint, $"
 				+ HINT_FEE + " gets subtracted.";
 	}
 	
