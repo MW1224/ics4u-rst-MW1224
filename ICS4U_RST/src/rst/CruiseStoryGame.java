@@ -12,9 +12,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -41,27 +43,28 @@ public class CruiseStoryGame extends Application {
 	private static final int GAP = 10, SMALL_GAP = 3;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	
-	// References for global objects
+	// Input/output UI controls & global variables
 	private Passenger passenger;
-	private RouteCard[][] routeGrid;
-	
-	// Global variables
-	private boolean eventDone;
-	
-	// Input/output UI controls
 	private Label lblTitle, lblInstructions, lblResult, lblRemainingMoney, lblErrorMessage;
+	private boolean eventDone;
+	private int dayNumber = 1;
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
 	private ChoiceBox<String> chcLoyaltyStatus;
 	private Scene mainScene;
 	// For Cruise Route Random Selection screen
+	private RouteCard[][] routeGrid;
 	private Label lblRoute;
 	// For Packing Scenario screen
 	private PackingScenario packingScenario;
 	private int[] itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];
 	private int itemIndex;
 	private Label lblWeight;
+	// For Royal Escape Room Mini Game screen
+	private EscapeRoom royalEscapeRoom;
+	// For Word Unscramble Mini Game screen
+	private WordUnscramble wordUnscrambleGame;
 	
 	/**
 	 * Overridden method to handle what happens when application stops.
@@ -317,7 +320,7 @@ public class CruiseStoryGame extends Application {
 		btnNext.setFont(Font.font(MEDIUM_FONT));
 		root.setRight(btnNext);
 		BorderPane.setAlignment(btnNext, Pos.CENTER);
-		btnNext.setOnAction(event -> showPackingScenario());
+		btnNext.setOnAction(event -> showPackingScenarioScreen());
 		
 		// Bottom section of the BorderPane layout
 		lblRoute = new Label("");
@@ -361,7 +364,7 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
-	private void showPackingScenario() {
+	private void showPackingScenarioScreen() {
 		// Local constants
 		final int SCREEN_WIDTH = 1200, SCREEN_HEIGHT = 900;
 		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 7)/2;
@@ -483,7 +486,7 @@ public class CruiseStoryGame extends Application {
 		// Button to move to next scene
 		Button btnStartCruise = new Button("Start Cruise Trip!");
 		btnStartCruise.setFont(Font.font(SMALL_FONT));
-		btnStartCruise.setOnAction(event -> showMiniGames());
+		btnStartCruise.setOnAction(event -> showMiniGamesScreen());
 		
 		root.getChildren().addAll(btnFinishPacking, lblResult, lblRemainingMoney, lblErrorMessage, btnStartCruise);
 		
@@ -516,13 +519,50 @@ public class CruiseStoryGame extends Application {
 		eventDone = true;
 	}
 	
-	private void showMiniGames() {
+	private void showMiniGamesScreen() {
 		if (!eventDone) {
-			lblErrorMessage.setText("Please finish packing before moving on.");
+			lblErrorMessage.setText("Please finish activity before moving on.");
 			return;
 		}
+		
+		// Root node for this JavaFX scene graph
+		VBox root = new VBox(GAP);
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		root.setAlignment(Pos.CENTER);
+		
+		// Label for title
+		lblTitle.setText("Day " + dayNumber);
+		// Label for instructions
+		lblInstructions.setText("Select a mini game:");
+		
+		root.getChildren().addAll(lblTitle, lblInstructions);
+		
+		// Toggle group with RadioButtons for mini game(s) options left to play - user must select one
+		ToggleGroup tgMiniGames = new ToggleGroup();
+		ArrayList<String> miniGamesLeft = passenger.getMiniGamesLeft();
+		
+		for (String miniGame : miniGamesLeft) {
+			RadioButton radMiniGame = new RadioButton(miniGame);
+			radMiniGame.setToggleGroup(tgMiniGames);
+			root.getChildren().add(radMiniGame);
+			radMiniGame.setOnAction(event -> playMiniGame(event));
+		}
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("Day " + dayNumber + " - Mini Games");
+			myStage.setScene(mainScene);
+			myStage.show();
+		}
 	}
-
+	
+	private void playMiniGame(ActionEvent event) {
+		
+	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
