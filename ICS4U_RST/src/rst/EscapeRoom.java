@@ -6,7 +6,7 @@ public class EscapeRoom extends MiniGame {
 	public static final String NAME = "Royal Escape Room";
 	public static final int START_BONUS = 20, INCORRECT_FEE = 6, HINT_FEE = 3;
 	public static final int [] LOCK_NUMS = {2, 1, 3, 5, 4};
-	private static final int[] FIRST_FIVE_LOCK_COMBOS = {16, 6, 10210, 312, 2610};
+	private static final String[] FIRST_FIVE_LOCK_COMBOS = {"16", "6", "10210", "312", "2610"};
 	private static final String[] LOCK_CLUES = {"Passenger decks on Oasis of the Seas", "Ignore the pink and green beach umbrellas",
 			"Oasis of the Seas (it's not the rows...)", "Only formal nights (left -> right; top -> bottom)", "'Life is better on a"
 			+ "cruise' - I,A,S", "Height of pyramid"};
@@ -36,11 +36,11 @@ public class EscapeRoom extends MiniGame {
 				+ HINT_FEE + " gets subtracted.";
 	}
 	
-	public String attemptUnlock(String strLock, int code) {
+	public String attemptUnlock(int lockNum, String code) {
 		Lock lock = null;
 		
 		for (Lock eachLock : allLocks) {
-			if (eachLock.toString().equals(strLock)) {
+			if (eachLock.getLockNumber() == lockNum) {
 				lock = eachLock;
 			}
 		}
