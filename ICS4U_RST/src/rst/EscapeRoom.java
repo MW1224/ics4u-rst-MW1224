@@ -94,6 +94,10 @@ public class EscapeRoom extends MiniGame {
 		}
 	}
 	
+	public String getLockCombo(int lockNum) {
+		return allLocks.get(lockNum - 1).getCombo();
+	}
+	
 	public String getConsonantPyramid(String word) {
 		String pyramid = "";
 		
