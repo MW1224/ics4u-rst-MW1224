@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -20,6 +21,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -620,6 +622,7 @@ public class CruiseStoryGame extends Application {
 		
 		// Show visual
 		GridPane gridVisual = new GridPane();
+		gridVisual.setAlignment(Pos.CENTER);
 		String [][] visual = royalEscapeRoom.getLockVisual(LOCK_NUM1);
 		for (int row = 0; row < visual.length; row++) {
 			for (int col = 0; col < visual[row].length; col++) {
@@ -631,6 +634,15 @@ public class CruiseStoryGame extends Application {
 		}
 		
 		root.getChildren().addAll(lblClue, gridVisual);
+		
+		// Section for user to pick which lock to open
+		FlowPane flowLockSelection = new FlowPane();
+		flowLockSelection.setAlignment(Pos.CENTER);
+		flowLockSelection.setRowValignment(VPos.TOP);
+		flowLockSelection.setHgap(GAP);
+		// Label for instructions
+		Label lblLockSelection = new Label("Choose a lock to open:");
+		lblLockSelection.setFont(Font.font(MEDIUM_FONT));
 		
 		Window routeWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
