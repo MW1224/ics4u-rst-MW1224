@@ -14,6 +14,7 @@ public class EscapeRoom extends MiniGame {
 			"Lock 3 - Number of times Oasis OTS appears in each column.", "Lock 4  - Number of times each letter (i/a/s) appears.",
 			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom - each night # increments by 1",
 			"Pyramid's number of rows."};
+	private static final String UNLOCKED = "UNLOCKED", LOCKED = "LOCKED";
 	
 	private ArrayList<Lock> allLocks;
 	private ArrayList<String> pyramidOutput;
@@ -55,11 +56,7 @@ public class EscapeRoom extends MiniGame {
 		}
 	}
 	
-	public ArrayList<Lock> getLocks() {
-		return allLocks;
-	}
-	
-	/*public String[] getStrLocks() {
+	public String[] getStrLocks() {
 		String[] strLocks = new String[allLocks.size()];
 		
 		for (int i = 0; i < strLocks.length; i++) {
@@ -67,7 +64,16 @@ public class EscapeRoom extends MiniGame {
 		}
 		
 		return strLocks;
-	}*/
+	}
+	
+	public String getStrLockState(int lockNum) {
+		Lock lock = allLocks.get(lockNum - 1);
+		if (lock.isOpen()) {
+			return UNLOCKED;
+		} else {
+			return LOCKED;
+		}
+	}
 	
 	public boolean getLockState(int lockNum) {
 		return allLocks.get(lockNum - 1).isOpen();
