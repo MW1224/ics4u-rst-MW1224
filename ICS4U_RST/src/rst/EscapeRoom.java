@@ -55,7 +55,11 @@ public class EscapeRoom extends MiniGame {
 		}
 	}
 	
-	public String[] getStrLocks() {
+	public ArrayList<Lock> getLocks() {
+		return allLocks;
+	}
+	
+	/*public String[] getStrLocks() {
 		String[] strLocks = new String[allLocks.size()];
 		
 		for (int i = 0; i < strLocks.length; i++) {
@@ -63,7 +67,7 @@ public class EscapeRoom extends MiniGame {
 		}
 		
 		return strLocks;
-	}
+	}*/
 	
 	public boolean getLockState(int lockNum) {
 		return allLocks.get(lockNum - 1).isOpen();
