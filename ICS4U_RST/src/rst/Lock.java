@@ -1,11 +1,11 @@
 package rst;
 
 public class Lock {
-	private String clue, hint;
+	private String clue, hint, combo;
 	private boolean state;	// false if locked, true if unlocked
-	private int lockNumber, combo, hintCount;
+	private int lockNumber, hintCount;
 	
-	public Lock(String lockClue, String lockHint, int lockCombo, int lockNum) {
+	public Lock(String lockClue, String lockHint, String lockCombo, int lockNum) {
 		clue = lockClue;
 		hint =lockHint;
 		state = false;
@@ -14,8 +14,8 @@ public class Lock {
 		hintCount = 0;
 	}
 	
-	public boolean unlock(int comboAttempt) {
-		if (comboAttempt == combo) {
+	public boolean unlock(String comboAttempt) {
+		if (comboAttempt.equals(combo)) {
 			return true;
 		} else {
 			return false;
@@ -26,7 +26,7 @@ public class Lock {
 		return state;
 	}
 	
-	public int getCombo() {
+	public String getCombo() {
 		return combo;
 	}
 	
@@ -53,7 +53,7 @@ public class Lock {
 	
 	public boolean equals(Object obj) {
 		Lock testLock = (Lock) obj;
-		if (testLock.getLockNumber() == lockNumber && testLock.getCombo() == combo && testLock.getClue().equals(clue) && testLock.getHint().equals(hint)) {
+		if (testLock.getLockNumber() == lockNumber && testLock.getCombo().equals(combo) && testLock.getClue().equals(clue) && testLock.getHint().equals(hint)) {
 			return true;
 		} else {
 			return false;
