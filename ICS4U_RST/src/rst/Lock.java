@@ -14,11 +14,25 @@ public class Lock {
 		hintCount = 0;
 	}
 	
-	public boolean unlock(String comboAttempt) {
-		if (comboAttempt.equals(combo)) {
+	public Lock(String lockClue, String lockHint, int lockNum) {
+		clue = lockClue;
+		hint =lockHint;
+		state = false;
+		combo = null;
+		lockNumber = lockNum;
+		hintCount = 0;
+	}
+	
+	public void setCombo(String newCombo) {
+		combo = newCombo;
+	}
+	
+	public boolean unlock(String comboAttempt, int actualLockNum) {
+		if (comboAttempt.equals(combo) && lockNumber == actualLockNum) {
 			state = true;
 			return true;
 		} else {
+			state = false;
 			return false;
 		}
 	}
