@@ -8,13 +8,15 @@ public class EscapeRoom extends MiniGame {
 	public static final int [] LOCK_NUMS = {2, 1, 3, 5, 4};
 	private static final String[] FIRST_FIVE_LOCK_COMBOS = {"16", "6", "10210", "312", "2610"};
 	private static final String[] LOCK_CLUES = {"Passenger decks on Oasis of the Seas", "Ignore the pink and green beach umbrellas",
-			"Oasis of the Seas (it's not the rows...)", "Only formal nights (left -> right; top -> bottom)", "'Life is better on a"
-			+ "cruise' - I,A,S", "Height of pyramid"};
+			"Oasis of the Seas (it's not the rows...)", "'Life is better on a cruise' - I,A,S", "Only formal nights (left -> right; top -> bottom)"
+			, "Height of pyramid"};
 	private static final String[] LOCK_HINTS = {"Lock 1 - Do a quick Google search!", "Lock 2 - Number of blue beach umbrellas.",
 			"Lock 3 - Number of times Oasis OTS appears in each column.", "Lock 4  - Number of times each letter (i/a/s) appears.",
 			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom - each night # increments by 1",
 			"Pyramid's number of rows."};
 	private static final String UNLOCKED = "UNLOCKED", LOCKED = "LOCKED";
+	private static final Lock[] LOCKS = new Lock[5];
+	private static final int[] LOCK_INDICES = {0, 1, 0, 0, 1};
 	
 	private ArrayList<Lock> allLocks;
 	private ArrayList<String> pyramidOutput;
@@ -25,7 +27,9 @@ public class EscapeRoom extends MiniGame {
 		bonusMoney = START_BONUS;
 		
 		for (int i = 0; i < FIRST_FIVE_LOCK_COMBOS.length; i++) {
-			allLocks.add(new Lock(LOCK_CLUES[i], LOCK_HINTS[i], FIRST_FIVE_LOCK_COMBOS[i], (i + 1)));
+			Lock newLock = new Lock(LOCK_CLUES[i], LOCK_HINTS[i], FIRST_FIVE_LOCK_COMBOS[i], (i + 1));
+			LOCKS[i] = newLock;
+			allLocks.add(newLock);
 		}
 	}
 	
@@ -37,7 +41,7 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public String attemptUnlock(int lockNum, String code) {
-		Lock lock = null;
+		/*Lock lock = null;
 		
 		for (Lock eachLock : allLocks) {
 			if (eachLock.getLockNumber() == lockNum) {
@@ -45,10 +49,16 @@ public class EscapeRoom extends MiniGame {
 			}
 		}
 		
-		boolean isUnlocked = lock.unlock(code);
+		boolean isUnlocked = lock.unlock(code);*/
+		
+		boolean isUnlocked = false;
+		Lock lock = LOCKS[lockNum - 1];
+		isUnlocked = lock.unlock(code);
 		
 		if (isUnlocked) {
-			allLocks.remove(lock);
+			if (lockNum != 4) {
+				allLocks.remove(LOCK_INDICES[lockNum - 1]);
+			}
 			return "Correct!";
 		} else {
 			bonusMoney -= INCORRECT_FEE;
@@ -67,7 +77,7 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public String getStrLockState(int lockNum) {
-		Lock lock = allLocks.get(lockNum - 1);
+		Lock lock = LOCKS[lockNum - 1];
 		if (lock.isOpen()) {
 			return UNLOCKED;
 		} else {
@@ -76,15 +86,15 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public boolean getLockState(int lockNum) {
-		return allLocks.get(lockNum - 1).isOpen();
+		return LOCKS[lockNum - 1].isOpen();
 	}
 	
 	public String getLockClue(int lockNum) {
-		return allLocks.get(lockNum - 1).getClue();
+		return LOCKS[lockNum - 1].getClue();
 	}
 	
 	public String getLockHint(int lockNum) {
-		Lock lock = allLocks.get(lockNum - 1);
+		Lock lock = LOCKS[lockNum - 1];
 		
 		if (lock.isEligibleForHint()) {
 			bonusMoney -= HINT_FEE;
@@ -95,7 +105,7 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public String getLockCombo(int lockNum) {
-		return allLocks.get(lockNum - 1).getCombo();
+		return LOCKS[lockNum - 1].getCombo();
 	}
 	
 	public String getConsonantPyramid(String word) {
