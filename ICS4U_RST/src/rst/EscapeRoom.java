@@ -15,15 +15,14 @@ public class EscapeRoom extends MiniGame {
 			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom - each night # increments by 1",
 			"Pyramid's number of rows."};
 	private static final String UNLOCKED = "UNLOCKED", LOCKED = "LOCKED";
-	private static final Lock[] LOCKS = new Lock[5];
+	private static final Lock[] LOCKS = new Lock[6];
 	private static final int[] LOCK_INDICES = {0, 1, 0, 0, 1};
 	
 	private ArrayList<Lock> allLocks;
-	private ArrayList<String> pyramidOutput;
+	private ArrayList<String> pyramidOutput = new ArrayList<String>();
 	
 	public EscapeRoom() {
 		allLocks = new ArrayList<Lock>();
-		pyramidOutput = new ArrayList<String>();
 		bonusMoney = START_BONUS;
 		
 		for (int i = 0; i < FIRST_FIVE_LOCK_COMBOS.length; i++) {
@@ -31,6 +30,8 @@ public class EscapeRoom extends MiniGame {
 			LOCKS[i] = newLock;
 			allLocks.add(newLock);
 		}
+		
+		LOCKS[5] = new Lock(LOCK_CLUES[5], LOCK_HINTS[5], 6);
 	}
 	
 	public static String showInstructions() {
@@ -40,23 +41,15 @@ public class EscapeRoom extends MiniGame {
 				+ HINT_FEE + " gets subtracted.";
 	}
 	
-	public String attemptUnlock(int lockNum, String code) {
-		/*Lock lock = null;
-		
-		for (Lock eachLock : allLocks) {
-			if (eachLock.getLockNumber() == lockNum) {
-				lock = eachLock;
-			}
-		}
-		
-		boolean isUnlocked = lock.unlock(code);*/
+	public String attemptUnlock(int lockNum, int actualLockNum, String code) {
 		
 		boolean isUnlocked = false;
 		Lock lock = LOCKS[lockNum - 1];
-		isUnlocked = lock.unlock(code);
+		
+		isUnlocked = lock.unlock(code, actualLockNum);
 		
 		if (isUnlocked) {
-			if (lockNum != 4) {
+			if (lockNum != 4 && lockNum != 6) {
 				allLocks.remove(LOCK_INDICES[lockNum - 1]);
 			}
 			return "Correct!";
@@ -111,19 +104,19 @@ public class EscapeRoom extends MiniGame {
 	public String getConsonantPyramid(String word) {
 		String pyramid = "";
 		
-		word.toUpperCase();
-		
-		consonantPyramid(word + "a", word.length());
+		consonantPyramid(word.toUpperCase() + "A", word.length());
 		
 		for (String row : pyramidOutput) {
 			pyramid += row + "\n";
 		}
 		
+		LOCKS[5].setCombo(String.valueOf(pyramidOutput.size()));
+		
 		return pyramid;
 	}
 	
 	private void consonantPyramid(String word, int vowelIndex) {
-		final char[] VOWELS = {'a', 'e', 'i', 'o', 'u', 'y'};
+		final char[] VOWELS = {'A', 'E', 'I', 'O', 'U', 'Y'};
 		boolean containsVowel = false;
 		
 		// First, check if word contains a vowel in order to create a pyramid by removing vowels
