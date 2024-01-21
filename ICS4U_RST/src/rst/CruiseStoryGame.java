@@ -52,6 +52,7 @@ public class CruiseStoryGame extends Application {
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	private final Image CLOSED_LOCK = new Image(getClass().getResource("/images/closedLock.png").toString());
 	private final Image OPEN_LOCK = new Image(getClass().getResource("/images/openLock.png").toString());
+	private final int LOCK_NUM_INDEX = 5;
 	
 	// Input/output UI controls & global variables
 	private Passenger passenger;
@@ -74,10 +75,15 @@ public class CruiseStoryGame extends Application {
 	private EscapeRoom royalEscapeRoom;
 	private int actualLockNum, lockIndex = 0, chosenLockNum;
 	private ImageView imgLock;
-	private Label lblLockNum, lblLockState, lblHint;
+	private Label lblClue, lblLockNum, lblLockState, lblHint;
 	private int[] lockComboNums;
 	private HBox hbxSliders;
-	private Button btnNextLock;
+	private Button btnHint, btnNextLock;
+	private ChoiceBox<String> chcLocks;
+	private GridPane gridVisual;
+	private Label lblWordPyramid;
+	private TextField txtWord, txtLockCombo;
+	private Button btnUnlock, btnEndGame;
 	// For Word Unscramble Mini Game screen
 	private WordUnscramble wordUnscrambleGame;
 	
@@ -618,21 +624,21 @@ public class CruiseStoryGame extends Application {
 		
 		if (temp.getText().equals(EscapeRoom.NAME)) {
 			royalEscapeRoom = new EscapeRoom();
+			passenger.removeMiniGame(temp.getText());
 			showEscapeRoomScreen();
 		} else if (temp.getText().equals(WordUnscramble.NAME)) {
+			wordUnscrambleGame = new WordUnscramble();
+			passenger.removeMiniGame(temp.getText());
 			showWordUnscrambleScreen();
 		}
 	}
 	
 	private void showEscapeRoomScreen() {
 		
-		// Local constants
+		// Local constant
 		final int SCREEN_WIDTH = 1100; 
-		final int IMG_HEIGHT = 90;
-		final int LOCK_NUM_INDEX = 5;
 		
 		// Local object and variables
-		String[] strLocks = royalEscapeRoom.getStrLocks();
 		actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
 		
 		VBox root = new VBox(GAP);
@@ -649,28 +655,20 @@ public class CruiseStoryGame extends Application {
 		root.getChildren().addAll(lblTitle, lblInstructions);
 		
 		// Label for clue
-		Label lblClue = new Label("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
+		lblClue = new Label("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
 		lblClue.setFont(Font.font(MEDIUM_FONT));
 		lblClue.setWrapText(true);
 		
 		// Show visual
-		GridPane gridVisual = new GridPane();
+		gridVisual = new GridPane();
 		gridVisual.setAlignment(Pos.CENTER);
-		String [][] visual = royalEscapeRoom.getLockVisual(actualLockNum);
-		for (int row = 0; row < visual.length; row++) {
-			for (int col = 0; col < visual[row].length; col++) {
-				ImageView imgVisual = new ImageView(new Image(getClass().getResource("/images/" + visual[row][col] + ".png").toString()));
-				imgVisual.setFitHeight(IMG_HEIGHT);
-				imgVisual.setPreserveRatio(true);
-				gridVisual.add(imgVisual, col, row);
-			}
-		}
+		showGridVisual();
 		
 		root.getChildren().addAll(lblClue, gridVisual);
 		
 		// Hint section
 		// Button
-		Button btnHint = new Button("Get Hint");
+		btnHint = new Button("Get Hint");
 		btnHint.setFont(Font.font(SMALL_FONT));
 		btnHint.setOnAction(event -> showHint());
 		// Label
@@ -692,17 +690,14 @@ public class CruiseStoryGame extends Application {
 		// Label for instructions
 		Label lblLockSelection = new Label("Choose a lock to open:");
 		lblLockSelection.setFont(Font.font(MEDIUM_FONT));
-		// ComboBox for lock choices
-		ChoiceBox<String> chcLocks = new ChoiceBox<String>();
-		chcLocks.getItems().addAll(strLocks);
-		String defaultLock = chcLocks.getItems().get(0);
-		chcLocks.setValue(defaultLock);
-		chosenLockNum = Integer.valueOf(String.valueOf(defaultLock.charAt(LOCK_NUM_INDEX)));;
+		// ChoiceBox for lock choices
+		chcLocks = new ChoiceBox<String>();
+		setLockChoiceBox();
 		
 		// StackPane for Lock Image & Text output
 		StackPane stackLock = new StackPane();
 		stackLock.setAlignment(Pos.CENTER);
-		imgLock = new ImageView(CLOSED_LOCK);
+		imgLock = new ImageView();
 		imgLock.setFitHeight(120);
 		imgLock.setPreserveRatio(true);
 		imgLock.setPreserveRatio(true);
@@ -714,6 +709,7 @@ public class CruiseStoryGame extends Application {
 		lblLockState = new Label();
 		lblLockState.setFont(Font.font(SMALL_FONT));
 		lblLockState.setBackground(new Background(new BackgroundFill(Color.PINK, new CornerRadii(1), Insets.EMPTY)));
+		setLockImage();
 		vbxLock.getChildren().addAll(lblLockNum, lblLockState);
 		stackLock.getChildren().addAll(imgLock, vbxLock);
 		
@@ -738,6 +734,7 @@ public class CruiseStoryGame extends Application {
 			public void changed(ObservableValue<? extends String> ov, String old_lock, String new_lock) {
 				chosenLockNum = Integer.valueOf(String.valueOf(new_lock.charAt(LOCK_NUM_INDEX)));
 				lblLockCombo.setText("Enter lock combination for lock " + chosenLockNum + ":");
+				setLockImage();
 				setSliders();
 			}
 		});
@@ -745,7 +742,7 @@ public class CruiseStoryGame extends Application {
 		hbxLockCombo.getChildren().add(hbxSliders);
 		
 		// Button for event handler
-		Button btnUnlock = new Button("Unlock");
+		btnUnlock = new Button("Unlock");
 		btnUnlock.setFont(Font.font(SMALL_FONT));
 		btnUnlock.setOnAction(event -> openLock());
 		hbxLockCombo.getChildren().addAll(btnUnlock);
@@ -763,7 +760,7 @@ public class CruiseStoryGame extends Application {
 		btnNextLock = new Button("Next Lock");
 		btnNextLock.setFont(Font.font(SMALL_FONT));
 		btnNextLock.setVisible(false);
-		btnNextLock.setOnAction(event -> showEscapeRoomScreen());
+		btnNextLock.setOnAction(event -> showNextLock());
 		
 		// Label for bonus money output
 		lblBonusMoney = new Label(royalEscapeRoom.showBonusAmount());
@@ -778,16 +775,55 @@ public class CruiseStoryGame extends Application {
 		
 		if (routeWindow instanceof Stage) {
 			Stage myStage = (Stage) routeWindow;
-			myStage.setTitle("Day " + dayNumber + " - Mini Games");
+			myStage.setTitle("Royal Escape Room");
 			myStage.setScene(mainScene);
 			myStage.show();
 		}
 	}
 	
-	private void setSliders() {
+	private void showGridVisual() {
+		int nightNum = 1;
+		gridVisual.getChildren().clear();
+		String [][] visual = royalEscapeRoom.getLockVisual(actualLockNum);
+		for (int row = 0; row < visual.length; row++) {
+			for (int col = 0; col < visual[row].length; col++) {
+				StackPane stackGrid = new StackPane();
+				ImageView imgVisual = new ImageView(new Image(getClass().getResource("/images/" + visual[row][col] + ".png").toString()));
+				imgVisual.setFitHeight(90);
+				imgVisual.setPreserveRatio(true);
+				Label lblGrid = new Label("");
+				lblGrid.setFont(Font.font(SMALL_FONT));
+				StackPane.setAlignment(lblGrid, Pos.BOTTOM_CENTER);
+				if (actualLockNum == 5) {
+					lblGrid.setText("Night " + (nightNum));
+					nightNum++;
+				}
+				stackGrid.getChildren().addAll(imgVisual, lblGrid);
+				gridVisual.add(stackGrid, col, row);
+			}
+		}
+	}
+	
+	private void setLockChoiceBox() {
+		/*chcLocks.setDisable(true);*/
+		String [] strLocks = royalEscapeRoom.getStrLocks();
+		chcLocks.getItems().setAll(strLocks);
+		chcLocks.setValue(strLocks[0]);
+		chosenLockNum = Integer.valueOf(String.valueOf(strLocks[0].charAt(LOCK_NUM_INDEX)));
+		chcLocks.setDisable(false);
+	}
+	
+	private void setLockImage() {
 		lblLockNum.setText(String.valueOf(chosenLockNum));
 		lblLockState.setText(royalEscapeRoom.getStrLockState(chosenLockNum));
-		
+		if (royalEscapeRoom.getLockState(chosenLockNum)) {
+			imgLock.setImage(OPEN_LOCK);
+		} else {
+			imgLock.setImage(CLOSED_LOCK);
+		}
+	}
+	
+	private void setSliders() {
 		hbxSliders.getChildren().clear();
 		
 		ArrayList<Slider> sldComboNums = new ArrayList<Slider>();
@@ -842,26 +878,231 @@ public class CruiseStoryGame extends Application {
 			return;
 		}
 		
-		for (int comboNum : lockComboNums) {
-			code += String.valueOf(comboNum);
+		if (chosenLockNum != 6) {
+			for (int comboNum : lockComboNums) {
+				code += String.valueOf(comboNum);
+			}
+		} else {
+			code = txtLockCombo.getText().trim();
 		}
 		
-		lblResult.setText(royalEscapeRoom.attemptUnlock(chosenLockNum, code));
+		lblResult.setText(royalEscapeRoom.attemptUnlock(chosenLockNum, actualLockNum, code));
 		
 		if (royalEscapeRoom.getLockState(chosenLockNum)) {
-			btnNextLock.setVisible(true);
-			imgLock.setImage(OPEN_LOCK);;
+			btnHint.setDisable(true);
+			if (chosenLockNum != 6) {
+				btnNextLock.setVisible(true);
+				setLockImage();
+				chcLocks.setDisable(true);
+			} else {
+				imgLock.setImage(OPEN_LOCK);
+				btnEndGame.setVisible(true);
+				lblBonusMoney.setText("Your final bonus money is $" + royalEscapeRoom.getBonusMoney());
+				passenger.updateTotalMoney(royalEscapeRoom.getBonusMoney());
+				lblRemainingMoney.setText(passenger.showMoneyLeft());
+			}
 		}
 		
-		lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
+		if (chosenLockNum != 6 || !royalEscapeRoom.getLockState(chosenLockNum)) {
+			lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
+		}
 	}
 	
 	private void showNextLock() {
-		lockIndex++;
+		if (actualLockNum != 4) {
+			lockIndex++;
+			
+			actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
+			
+			lblClue.setText("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
+		
+			if (royalEscapeRoom.needsVisual(actualLockNum)) {
+				gridVisual.setVisible(true);
+				showGridVisual();
+			} else {
+				gridVisual.setVisible(false);
+			}
+			
+			btnHint.setDisable(false);
+			lblHint.setText("");
+			lblResult.setText("");
+			btnNextLock.setVisible(false);
+
+			setLockChoiceBox();
+		} else {
+			actualLockNum = 6;
+			showLastLock();
+		}
+	}
+	
+	private void showLastLock() {
+		final int SCREEN_WIDTH = 1000;
+		
+		VBox root = new VBox(GAP);
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		root.setAlignment(Pos.CENTER);
+		
+		chosenLockNum = 6;
+		
+		lblTitle.setText("Final lock! This is the lock on the lifeboat.");
+		root.getChildren().add(lblTitle);
+		
+		// Section for word input
+		BorderPane borderWordInput = new BorderPane();
+		// Top of BorderPane
+		HBox hbxTop = new HBox(GAP);
+		Label lblWordPrompt = new Label("Enter a word:");
+		lblWordPrompt.setFont(Font.font(MEDIUM_FONT));
+		txtWord = new TextField();
+		Button btnEnterWord = new Button("Enter");
+		btnEnterWord.setFont(Font.font(MEDIUM_FONT));
+		btnEnterWord.setOnAction(event -> enterWord());
+		hbxTop.getChildren().addAll(lblWordPrompt, txtWord, btnEnterWord);
+		borderWordInput.setTop(hbxTop);
+		// Right side of BorderPane
+		lblWordPyramid = new Label("");
+		lblWordPyramid.setFont(Font.font(MEDIUM_FONT));
+		borderWordInput.setRight(lblWordPyramid);
+		BorderPane.setAlignment(lblWordPyramid, Pos.CENTER_LEFT);
+		// Center of BorderPane
+		StackPane stackCenter = new StackPane();
+		ImageView imgLifeBoat = new ImageView(new Image(getClass().getResource("/images/lifeBoat2.png").toString()));
+		imgLifeBoat.setFitHeight(150);
+		imgLifeBoat.setPreserveRatio(true);
+		imgLock.setImage(CLOSED_LOCK);
+		imgLock.setFitHeight(90);
+		stackCenter.getChildren().addAll(imgLifeBoat, imgLock);
+		borderWordInput.setCenter(stackCenter);
+		BorderPane.setAlignment(stackCenter, Pos.CENTER);
+		// Bottom of BorderPane
+		VBox vbxBottom = new VBox(GAP);
+		lblClue.setText("Clue: " + royalEscapeRoom.getLockClue(chosenLockNum));
+		Button btnHint = new Button("Get Hint");
+		btnHint.setFont(Font.font(SMALL_FONT));
+		btnHint.setOnAction(event -> showHint());
+		lblHint.setText("");
+		lblErrorMessage.setText("");
+		vbxBottom.getChildren().addAll(lblClue, btnHint, lblHint, lblErrorMessage);
+		borderWordInput.setBottom(vbxBottom);
+		root.getChildren().add(borderWordInput);
+		
+		// Section for lock combo
+		HBox hbxLockCombo = new HBox(GAP);
+		// Label for lock combo prompt
+		Label lblComboPrompt = new Label("Enter lock combination:");
+		lblComboPrompt.setFont(Font.font(MEDIUM_FONT));
+		// TextField for lock combo input
+		txtLockCombo = new TextField();
+		txtLockCombo.setDisable(true);
+		hbxLockCombo.getChildren().addAll(lblComboPrompt, txtLockCombo);
+		root.getChildren().add(hbxLockCombo);
+		
+		// Section for unlocking/output
+		HBox hbxUnlocking = new HBox(GAP);
+		// Button for event handler
+		btnUnlock.setVisible(false);
+		// Label for result output
+		lblResult.setText("");
+		hbxUnlocking.getChildren().addAll(btnUnlock, lblResult, lblBonusMoney);
+		root.getChildren().add(hbxUnlocking);
+		
+		// Button to end game
+		btnEndGame = new Button("End Game");
+		btnEndGame.setFont(Font.font(MEDIUM_FONT));
+		btnEndGame.setVisible(false);
+		btnEndGame.setOnAction(event -> showMiniGamesScreen());
+		root.getChildren().addAll(lblRemainingMoney, btnEndGame);
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("Royal Escape Room: Final Lock");
+			myStage.setScene(mainScene);
+			myStage.show();
+		}
+	}
+	
+	private void enterWord() {
+		String word = txtWord.getText().trim();
+		
+		// Input validation
+		if (word.isEmpty()) {
+			lblErrorMessage.setText("Invalid input (cannot be blank).");
+			return;
+		} else if (!royalEscapeRoom.validateWord(word)) {
+			lblErrorMessage.setText("Invalid input (must be a word).");
+			return;
+		}
+		
+		lblErrorMessage.setText("");
+		lblWordPyramid.setText(royalEscapeRoom.getConsonantPyramid(word));
+		txtLockCombo.setDisable(false);
+		btnUnlock.setVisible(true);
+		txtWord.setDisable(true);
 	}
 	
 	private void showWordUnscrambleScreen() {
+		final int SCREEN_WIDTH = 1150;
 		
+		BorderPane root = new BorderPane();
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		
+		// Top section
+		VBox vbxTop = new VBox(GAP);
+		lblTitle.setText(wordUnscrambleGame.toString());
+		lblInstructions.setText(WordUnscramble.showInstructions());
+		vbxTop.getChildren().addAll(lblTitle, lblInstructions);
+		root.setTop(vbxTop);
+		
+		// Left section
+		VBox vbxLeft = new VBox(GAP);
+		Label lblBonusPtsSystem = new Label(WordUnscramble.showPointsSystem());
+		lblBonusPtsSystem.setFont(Font.font(MEDIUM_FONT));
+		Label lblLetters = new Label("Letters: " + WordUnscramble.WORD);
+		lblLetters.setFont(Font.font(MEDIUM_FONT));
+		Label lblNumOfPossibleWords = new Label("Number of possible words: " + WordUnscramble.NUM_OF_POSSIBLE_WORDS);
+		lblNumOfPossibleWords.setFont(Font.font(MEDIUM_FONT));
+		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblLetters, lblNumOfPossibleWords);
+		root.setLeft(vbxLeft);
+		
+		// Right section
+		String strPossibleWords = "Possible Words:\n";
+		String[] possibleWords = WordUnscramble.POSSIBLE_WORDS;
+		for (int i = 0; i < possibleWords.length; i++) {
+			strPossibleWords += possibleWords[i];
+			if (i % 2 == 0) {	// even
+				strPossibleWords += "\t";
+			} else if (i != possibleWords.length - 1){
+				strPossibleWords += "\n";
+			}
+		}
+		Label lblPossibleWords = new Label(strPossibleWords);
+		lblPossibleWords.setFont(Font.font(SMALL_FONT));
+		root.setRight(lblPossibleWords);
+		
+		// Center section
+		GridPane gridCenter = new GridPane();
+		gridCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		
+		TextField [] txtWords = new TextField[WordUnscramble.NUM_OF_POSSIBLE_WORDS];
+		ImageView [] imgOutputs = new ImageView[WordUnscramble.NUM_OF_POSSIBLE_WORDS];
+		
+		// set imageviews to 30 height
+		for (int j = 0; j < WordUnscramble.NUM_OF_POSSIBLE_WORDS; j++) {
+			
+		}
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("Word Unscramble");
+			myStage.setScene(mainScene);
+			myStage.show();
+		}
 	}
 	
 	public static void main(String[] args) {
