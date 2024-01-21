@@ -16,6 +16,7 @@ public class Lock {
 	
 	public boolean unlock(String comboAttempt) {
 		if (comboAttempt.equals(combo)) {
+			state = true;
 			return true;
 		} else {
 			return false;
