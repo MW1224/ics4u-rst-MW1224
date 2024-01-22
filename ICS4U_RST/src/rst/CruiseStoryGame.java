@@ -941,6 +941,7 @@ public class CruiseStoryGame extends Application {
 			
 			actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
 			
+			lblHint.setText("");
 			lblClue.setText("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
 		
 			if (royalEscapeRoom.needsVisual(actualLockNum)) {
@@ -1094,6 +1095,7 @@ public class CruiseStoryGame extends Application {
 		lblNumOfPossibleWords.setFont(Font.font(MEDIUM_FONT));
 		lblBonusMoney.setText("");
 		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblLetters, lblNumOfPossibleWords, lblBonusMoney, lblRemainingMoney);
+		BorderPane.setAlignment(vbxLeft, Pos.CENTER);
 		root.setLeft(vbxLeft);
 		
 		// Right section
