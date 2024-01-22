@@ -28,28 +28,29 @@ public class WordUnscramble extends MiniGame {
 	
 	public static String showInstructions() {
 		return "Using the letters below, you must create as many words as possible:\n\t- The words don't"
-				+ "need to use all 5 letters\n\t- No duplicate words\n\t- Words must be actual words\n\t"
+				+ " need to use all 5 letters\n\t- No duplicate words\n\t- Words must be actual words\n\t"
 				+ "- Only click 'done' when you're done entering all your words";
 	}
 	
 	public static String showPointsSystem() {
 		return "Bonus money (starting at $" + START_BONUS + "):\n\t- Each incorrect word: -$" + (-1 * INCORRECT_FEE)
-				+ "\n\t- Each correct word: +$" + CORRECT_BONUS + "\n\t- Each blank word: -$" + BLANK_FEE;
+				+ "\n\t- Each correct word: +$" + CORRECT_BONUS + "\n\t- Each blank word: -$" + (-1 * BLANK_FEE);
 	}
 	
 	public String[] checkWords(String[] wordsToCheck) {
 		String[] correctWords = new String[22];
-		boolean foundMatch = false;
+		boolean foundMatch;
 		
 		// Check words entered by player
 		for (int i = 0; i < wordsToCheck.length; i++) {
+			foundMatch = false;
 			String testWord = wordsToCheck[i].toLowerCase();
 			
 			if (testWord.isEmpty()) {	// if word is blank
 				correctWords[i] = BLANK;
 				bonusMoney += BLANK_FEE;
 			} else {
-				for (String possibleWord : POSSIBLE_WORDS) {
+				for (String possibleWord : possibleWordsLeft) {
 					if (testWord.equals(possibleWord)) {
 						foundMatch = true;
 					}
