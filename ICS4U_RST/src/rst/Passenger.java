@@ -173,7 +173,7 @@ public class Passenger {
 			result += "lost!";
 		}
 		
-		result += "\nYou had $" + totalMoney + "left.\n";
+		result += "\nYou had $" + totalMoney + " left.\n";
 		
 		if (totalMoney > highScore) {
 			highScore = totalMoney;
