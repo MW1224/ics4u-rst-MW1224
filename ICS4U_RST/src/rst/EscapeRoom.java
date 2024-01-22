@@ -59,6 +59,10 @@ public class EscapeRoom extends MiniGame {
 		}
 	}
 	
+	public boolean canHaveHint(int lockNum) {
+		return LOCKS[lockNum - 1].isEligibleForHint();
+	}
+	
 	public String[] getStrLocks() {
 		String[] strLocks = new String[allLocks.size()];
 		
