@@ -690,10 +690,14 @@ public class CruiseStoryGame extends Application {
 		btnHint.setFont(Font.font(SMALL_FONT));
 		btnHint.setOnAction(event -> showHint());
 		// Label
+		HBox hbxHint = new HBox(GAP);
+		hbxHint.setAlignment(Pos.CENTER);
 		lblHint = new Label("");
 		lblHint.setFont(Font.font(SMALL_FONT));
 		lblHint.setWrapText(true);
-		root.getChildren().addAll(btnHint, lblHint);
+		lblErrorMessage.setText("");
+		hbxHint.getChildren().addAll(lblHint, lblErrorMessage);
+		root.getChildren().addAll(btnHint, hbxHint);
 		
 		// Section for user to pick which lock to openImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
 		ImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
@@ -885,7 +889,11 @@ public class CruiseStoryGame extends Application {
 	}
 	
 	private void showHint() {
-		lblHint.setText(royalEscapeRoom.getLockHint(actualLockNum));
+		if (royalEscapeRoom.canHaveHint(actualLockNum)) {
+			lblHint.setText(royalEscapeRoom.getLockHint(actualLockNum));
+		} else {
+			lblErrorMessage.setText(royalEscapeRoom.getLockHint(actualLockNum));
+		}
 		lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
 	}
 	
