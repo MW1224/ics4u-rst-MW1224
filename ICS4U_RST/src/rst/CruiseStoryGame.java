@@ -61,7 +61,7 @@ public class CruiseStoryGame extends Application {
 	private Label lblTitle, lblInstructions, lblResult, lblRemainingMoney, lblErrorMessage, lblBonusMoney;
 	private boolean eventDone;
 	private int dayNumber = 1;
-	private Button btnEndGame;
+	private Button btnEndGame, btnStartCruise;
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
@@ -93,6 +93,9 @@ public class CruiseStoryGame extends Application {
 	private TextField[] txtWords;
 	private ImageView[] imgOutputs;
 	private Label lblPossibleWords;
+	// For Activities Scenario screen
+	private TextField[] txtNumsPerActivities;
+	private Button btnDoneActivities;
 	
 	/**
 	 * Overridden method to handle what happens when application stops.
@@ -545,7 +548,7 @@ public class CruiseStoryGame extends Application {
 		lblErrorMessage.setText("");
 		
 		// Button to move to next scene
-		Button btnStartCruise = new Button("Start Cruise Trip!");
+		btnStartCruise = new Button("Start Cruise Trip!");
 		btnStartCruise.setFont(Font.font(SMALL_FONT));
 		btnStartCruise.setOnAction(event -> showMiniGamesScreen());
 		
@@ -620,7 +623,7 @@ public class CruiseStoryGame extends Application {
 				
 				btnEndGame = new Button("End Game");
 				btnEndGame.setFont(Font.font(MEDIUM_FONT));
-				btnEndGame.setOnAction(event -> showMiniGamesScreen());
+				btnEndGame.setOnAction(event -> showActivitiesScreen());
 				radMiniGame.setOnAction(event -> playMiniGame(event));
 			}
 			
@@ -686,18 +689,18 @@ public class CruiseStoryGame extends Application {
 		
 		// Hint section
 		// Button
+		HBox hbxHint = new HBox(GAP);
+		hbxHint.setAlignment(Pos.CENTER);
 		btnHint = new Button("Get Hint");
 		btnHint.setFont(Font.font(SMALL_FONT));
 		btnHint.setOnAction(event -> showHint());
+		lblErrorMessage.setText("");
+		hbxHint.getChildren().addAll(btnHint, lblErrorMessage);
 		// Label
-		HBox hbxHint = new HBox(GAP);
-		hbxHint.setAlignment(Pos.CENTER);
 		lblHint = new Label("");
 		lblHint.setFont(Font.font(SMALL_FONT));
 		lblHint.setWrapText(true);
-		lblErrorMessage.setText("");
-		hbxHint.getChildren().addAll(lblHint, lblErrorMessage);
-		root.getChildren().addAll(btnHint, hbxHint);
+		root.getChildren().addAll(hbxHint, lblHint);
 		
 		// Section for user to pick which lock to openImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
 		ImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
@@ -1192,6 +1195,108 @@ public class CruiseStoryGame extends Application {
 		passenger.updateTotalMoney(wordUnscrambleGame.getBonusMoney());
 		lblRemainingMoney.setText(passenger.showMoneyLeft());
 		
+	}
+	
+	private void showActivitiesScreen() {
+		final int SCREEN_WIDTH = 1250;
+		final int NUM_OF_ACTIVITIES = ActivitiesScenario.ACTIVITIES.length;
+		final int HALF =( NUM_OF_ACTIVITIES + 1) / 2;
+		
+		ImageView[] imgActivities = new ImageView[NUM_OF_ACTIVITIES];
+		Label lblActivity;
+		int rowIndex;
+		
+		VBox root = new VBox(GAP);
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		root.setAlignment(Pos.CENTER);
+		
+		// Title
+		lblTitle.setText("Day " + dayNumber + ": Activities");
+		lblInstructions.setText(ActivitiesScenario.showInstructions());
+		root.getChildren().addAll(lblTitle, lblInstructions);
+		
+		// GridPane section for user input
+		GridPane gridInput = new GridPane();
+		gridInput.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		gridInput.setAlignment(Pos.CENTER);
+		
+		txtNumsPerActivities = new TextField[NUM_OF_ACTIVITIES];
+		
+		for (int i = 0; i < NUM_OF_ACTIVITIES; i++) {
+			lblActivity = new Label(ActivitiesScenario.ACTIVITIES[i]);
+			txtNumsPerActivities[i] = new TextField();
+			imgActivities[i].setFitHeight(65);
+			imgActivities[i].setPreserveRatio(true);
+			
+			if (i < HALF) {	// TextFields/ImageViews 1-7
+				rowIndex = i * 2;
+				gridInput.add(imgActivities[i], 0, rowIndex, 2, 2);
+				gridInput.add(lblActivity, 2, rowIndex, 2, 1);
+				gridInput.add(txtNumsPerActivities[i], 4, rowIndex);
+			} else {	// TextFields/ImageViews 8-13
+				rowIndex = (i - HALF) * 2;
+				gridInput.add(imgActivities[i], 6, rowIndex, 2, 2);
+				gridInput.add(lblActivity, 8, rowIndex, 2, 1);
+				gridInput.add(txtNumsPerActivities[i], 10, rowIndex);
+			}
+		}
+		
+		HBox hbxResult = new HBox(GAP);
+		hbxResult.setAlignment(Pos.CENTER);
+		btnDoneActivities = new Button("Done");
+		btnDoneActivities.setFont(Font.font(SMALL_FONT));
+		btnDoneActivities.setOnAction(event -> calculateActivitiesCost());
+		lblResult.setText("");
+		hbxResult.getChildren().addAll(btnDoneActivities, lblResult);
+		
+		lblErrorMessage.setText("");
+		
+		HBox hbxBottom = new HBox(GAP);
+		hbxBottom.setAlignment(Pos.CENTER);
+		btnStartCruise.setText("Next");
+		btnStartCruise.setDisable(true);
+		hbxBottom.getChildren().addAll(btnStartCruise, lblRemainingMoney);
+		root.getChildren().addAll(hbxResult, lblErrorMessage, hbxBottom);
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("End Screen");
+			myStage.setScene(mainScene);
+			myStage.show();
+		}
+	}
+	
+	private void calculateActivitiesCost() {
+		int[] numOfEachActivity = new int[ActivitiesScenario.ACTIVITIES.length];
+		
+		for (int i = 0; i < numOfEachActivity.length; i++) {
+			String textInput = txtNumsPerActivities[i].getText().trim();
+			
+			if (textInput.isEmpty()) {
+				lblErrorMessage.setText("Invalid entry (empty box).");
+				return;
+			}
+			
+			try {
+				numOfEachActivity[i] = Integer.parseInt(textInput);
+			} catch (NumberFormatException e) {
+				lblErrorMessage.setText("Invalid entry (Please enter a number)");
+				return;
+			}
+		}
+		
+		ActivitiesScenario activitiesScenario = new ActivitiesScenario(numOfEachActivity);
+		
+		lblResult.setText(activitiesScenario.showChangeInMoney());
+		
+		passenger.updateTotalMoney(activitiesScenario.getChangeInMoney());
+		lblRemainingMoney.setText(passenger.showMoneyLeft());
+		
+		btnStartCruise.setDisable(false);
+		btnDoneActivities.setDisable(true);
 	}
 	
 	private void showEndScreen() {
