@@ -130,7 +130,7 @@ public class EscapeRoom extends MiniGame {
 			}
 		}
 		
-		if (containsVowel) {
+		if (containsVowel && word.length() > 1) {
 			checkVowelFromEnd:
 			for (int i = word.length() - 1; i >= 0; i--) {
 				for (char testVowel : VOWELS) {
