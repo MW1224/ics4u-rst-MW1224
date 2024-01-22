@@ -635,7 +635,6 @@ public class CruiseStoryGame extends Application {
 				myStage.setTitle("Day " + dayNumber + " - Mini Games");
 				myStage.setScene(mainScene);
 				myStage.show();
-				dayNumber++;
 			}
 		}
 	}
@@ -682,6 +681,8 @@ public class CruiseStoryGame extends Application {
 		
 		// Show visual
 		gridVisual = new GridPane();
+		gridVisual.setHgap(GAP);	// sets gaps between columns
+		gridVisual.setVgap(GAP);	// sets gaps between rows
 		gridVisual.setAlignment(Pos.CENTER);
 		showGridVisual();
 		
@@ -944,7 +945,6 @@ public class CruiseStoryGame extends Application {
 			
 			actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
 			
-			lblHint.setText("");
 			lblClue.setText("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
 		
 			if (royalEscapeRoom.needsVisual(actualLockNum)) {
@@ -955,6 +955,7 @@ public class CruiseStoryGame extends Application {
 			}
 			
 			btnHint.setDisable(false);
+			lblErrorMessage.setText("");
 			lblHint.setText("");
 			lblResult.setText("");
 			btnNextLock.setVisible(false);
@@ -1115,6 +1116,8 @@ public class CruiseStoryGame extends Application {
 		
 		// Center section
 		GridPane gridCenter = new GridPane();
+		gridCenter.setHgap(GAP);	// sets gaps between columns
+		gridCenter.setVgap(GAP);	// sets gaps between rows
 		gridCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
 		txtWords = new TextField[NUM_OF_POSSIBLE_WORDS];
@@ -1200,7 +1203,7 @@ public class CruiseStoryGame extends Application {
 	private void showActivitiesScreen() {
 		final int SCREEN_WIDTH = 1250;
 		final int NUM_OF_ACTIVITIES = ActivitiesScenario.ACTIVITIES.length;
-		final int HALF =( NUM_OF_ACTIVITIES + 1) / 2;
+		final int HALF = NUM_OF_ACTIVITIES / 2;
 		
 		ImageView[] imgActivities = new ImageView[NUM_OF_ACTIVITIES];
 		Label lblActivity;
@@ -1217,16 +1220,19 @@ public class CruiseStoryGame extends Application {
 		
 		// GridPane section for user input
 		GridPane gridInput = new GridPane();
+		gridInput.setHgap(GAP);	// sets gaps between columns
+		gridInput.setVgap(GAP);	// sets gaps between rows
 		gridInput.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		gridInput.setAlignment(Pos.CENTER);
 		
 		txtNumsPerActivities = new TextField[NUM_OF_ACTIVITIES];
 		
 		for (int i = 0; i < NUM_OF_ACTIVITIES; i++) {
-			lblActivity = new Label(ActivitiesScenario.ACTIVITIES[i]);
-			txtNumsPerActivities[i] = new TextField();
+			imgActivities[i] = new ImageView(new Image(getClass().getResource("/images/activity" + i + ".png").toString()));
 			imgActivities[i].setFitHeight(65);
 			imgActivities[i].setPreserveRatio(true);
+			lblActivity = new Label(ActivitiesScenario.ACTIVITIES[i] + " ($" + i + "):");
+			txtNumsPerActivities[i] = new TextField();
 			
 			if (i < HALF) {	// TextFields/ImageViews 1-7
 				rowIndex = i * 2;
@@ -1240,6 +1246,7 @@ public class CruiseStoryGame extends Application {
 				gridInput.add(txtNumsPerActivities[i], 10, rowIndex);
 			}
 		}
+		root.getChildren().add(gridInput);
 		
 		HBox hbxResult = new HBox(GAP);
 		hbxResult.setAlignment(Pos.CENTER);
@@ -1247,6 +1254,7 @@ public class CruiseStoryGame extends Application {
 		btnDoneActivities.setFont(Font.font(SMALL_FONT));
 		btnDoneActivities.setOnAction(event -> calculateActivitiesCost());
 		lblResult.setText("");
+		lblResult.setFont(Font.font(MEDIUM_FONT));
 		hbxResult.getChildren().addAll(btnDoneActivities, lblResult);
 		
 		lblErrorMessage.setText("");
@@ -1266,6 +1274,7 @@ public class CruiseStoryGame extends Application {
 			myStage.setTitle("End Screen");
 			myStage.setScene(mainScene);
 			myStage.show();
+			dayNumber++;
 		}
 	}
 	
@@ -1289,6 +1298,8 @@ public class CruiseStoryGame extends Application {
 		}
 		
 		ActivitiesScenario activitiesScenario = new ActivitiesScenario(numOfEachActivity);
+		
+		activitiesScenario.calculateCost();
 		
 		lblResult.setText(activitiesScenario.showChangeInMoney());
 		
