@@ -116,7 +116,7 @@ public class Passenger {
 	
 	public String toString() {
 		String passengerString = firstName + " " + lastName + "\n" + email + "\n" + phoneNumber + "\nLoyalty Status: " + loyaltyStatus
-				+ "\nTotal Money: " + totalMoney + "\nHigh Score Out of All Games: " + highScore;
+				+ "\nTotal Money: " + totalMoney;
 		return passengerString;
 	}
 	
@@ -152,10 +152,6 @@ public class Passenger {
 		return "High score (out of all games): $" + highScore;
 	}
 	
-	public void setNewHighScore(int newHighScore) {
-		highScore = newHighScore;
-	}
-	
 	public int getHighScore() {
 		return highScore;
 	}
@@ -180,6 +176,7 @@ public class Passenger {
 		result += "\nYou had $" + totalMoney + "left.\n";
 		
 		if (totalMoney > highScore) {
+			highScore = totalMoney;
 			result += "You set a new high score!\n";
 		}
 		
