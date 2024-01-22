@@ -53,12 +53,15 @@ public class CruiseStoryGame extends Application {
 	private final Image CLOSED_LOCK = new Image(getClass().getResource("/images/closedLock.png").toString());
 	private final Image OPEN_LOCK = new Image(getClass().getResource("/images/openLock.png").toString());
 	private final int LOCK_NUM_INDEX = 5;
+	private final Image imgBLANK = new Image(getClass().getResource("/images/white.png").toString());
+	private final int NUM_OF_POSSIBLE_WORDS = WordUnscramble.NUM_OF_POSSIBLE_WORDS;
 	
 	// Input/output UI controls & global variables
 	private Passenger passenger;
 	private Label lblTitle, lblInstructions, lblResult, lblRemainingMoney, lblErrorMessage, lblBonusMoney;
 	private boolean eventDone;
 	private int dayNumber = 1;
+	private Button btnEndGame;
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
@@ -83,9 +86,13 @@ public class CruiseStoryGame extends Application {
 	private GridPane gridVisual;
 	private Label lblWordPyramid;
 	private TextField txtWord, txtLockCombo;
-	private Button btnUnlock, btnEndGame;
+	private Button btnUnlock;
 	// For Word Unscramble Mini Game screen
 	private WordUnscramble wordUnscrambleGame;
+	private Button btnDone;
+	private TextField[] txtWords;
+	private ImageView[] imgOutputs;
+	private Label lblPossibleWords;
 	
 	/**
 	 * Overridden method to handle what happens when application stops.
@@ -577,45 +584,56 @@ public class CruiseStoryGame extends Application {
 		// Local constants
 		final int SCREEN_WIDTH = 400, GAMES_SCREEN_HEIGHT = 400;
 		
-		if (!eventDone) {
-			lblErrorMessage.setText("Please finish activity before moving on.");
-			return;
-		}
-		
-		// Root node for this JavaFX scene graph
-		VBox root = new VBox(GAP);
-		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
-		root.setAlignment(Pos.CENTER);
-		
-		// Label for title
-		lblTitle.setText("Day " + dayNumber);
-		// Label for instructions
-		lblInstructions.setText("Select a mini game:");
-		lblInstructions.setFont(Font.font(LARGE_FONT));
-		
-		root.getChildren().addAll(lblTitle, lblInstructions);
-		
-		// Toggle group with RadioButtons for mini game(s) options left to play - user must select one
-		ToggleGroup tgMiniGames = new ToggleGroup();
-		ArrayList<String> miniGamesLeft = passenger.getMiniGamesLeft();
-		
-		for (String miniGame : miniGamesLeft) {
-			RadioButton radMiniGame = new RadioButton(miniGame);
-			radMiniGame.setFont(Font.font(LARGE_FONT));
-			radMiniGame.setToggleGroup(tgMiniGames);
-			root.getChildren().add(radMiniGame);
-			radMiniGame.setOnAction(event -> playMiniGame(event));
-		}
-		
-		Window routeWindow = mainScene.getWindow();
-		mainScene = new Scene(root, SCREEN_WIDTH, GAMES_SCREEN_HEIGHT);
-		
-		if (routeWindow instanceof Stage) {
-			Stage myStage = (Stage) routeWindow;
-			myStage.setTitle("Day " + dayNumber + " - Mini Games");
-			myStage.setScene(mainScene);
-			myStage.show();
-			dayNumber++;
+		if (dayNumber == 3) {
+			showEndScreen();
+		} else {
+			if (!eventDone) {
+				lblErrorMessage.setText("Please finish activity before moving on.");
+				return;
+			}
+			
+			ArrayList<String> miniGamesLeft = passenger.getMiniGamesLeft();
+			
+			// Root node for this JavaFX scene graph
+			VBox root = new VBox(GAP);
+			root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+			root.setAlignment(Pos.CENTER);
+			
+			// Label for title
+			lblTitle.setText("Day " + dayNumber);
+			// Label for instructions
+			lblInstructions.setText("Select a mini game:");
+			lblInstructions.setFont(Font.font(LARGE_FONT));
+			
+			root.getChildren().addAll(lblTitle, lblInstructions);
+			
+			// Toggle group with RadioButtons for mini game(s) options left to play - user must select one
+			ToggleGroup tgMiniGames = new ToggleGroup();
+			
+			for (String miniGame : miniGamesLeft) {
+				RadioButton radMiniGame = new RadioButton(miniGame);
+				radMiniGame.setFont(Font.font(LARGE_FONT));
+				radMiniGame.setToggleGroup(tgMiniGames);
+				root.getChildren().add(radMiniGame);
+				lblBonusMoney = new Label("");
+				lblBonusMoney.setFont(Font.font(MEDIUM_FONT));
+				
+				btnEndGame = new Button("End Game");
+				btnEndGame.setFont(Font.font(MEDIUM_FONT));
+				btnEndGame.setOnAction(event -> showMiniGamesScreen());
+				radMiniGame.setOnAction(event -> playMiniGame(event));
+			}
+			
+			Window routeWindow = mainScene.getWindow();
+			mainScene = new Scene(root, SCREEN_WIDTH, GAMES_SCREEN_HEIGHT);
+			
+			if (routeWindow instanceof Stage) {
+				Stage myStage = (Stage) routeWindow;
+				myStage.setTitle("Day " + dayNumber + " - Mini Games");
+				myStage.setScene(mainScene);
+				myStage.show();
+				dayNumber++;
+			}
 		}
 	}
 	
@@ -636,7 +654,7 @@ public class CruiseStoryGame extends Application {
 	private void showEscapeRoomScreen() {
 		
 		// Local constant
-		final int SCREEN_WIDTH = 1100; 
+		final int SCREEN_WIDTH = 1250; 
 		
 		// Local object and variables
 		actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
@@ -722,6 +740,8 @@ public class CruiseStoryGame extends Application {
 		
 		// Section for lock combo input
 		HBox hbxLockCombo = new HBox(GAP);
+		hbxLockCombo.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		hbxLockCombo.setAlignment(Pos.CENTER);
 		// Label
 		Label lblLockCombo = new Label("Enter lock combination for lock " + chosenLockNum + ":");
 		lblLockCombo.setFont(Font.font(MEDIUM_FONT));
@@ -751,6 +771,7 @@ public class CruiseStoryGame extends Application {
 		
 		// Section for bonus money & "Next Lock" button
 		HBox hbxBottom = new HBox(50);
+		hbxBottom.setAlignment(Pos.CENTER);
 		
 		// Label for results
 		lblResult.setText("");
@@ -763,9 +784,7 @@ public class CruiseStoryGame extends Application {
 		btnNextLock.setOnAction(event -> showNextLock());
 		
 		// Label for bonus money output
-		lblBonusMoney = new Label(royalEscapeRoom.showBonusAmount());
-		lblBonusMoney.setFont(Font.font(MEDIUM_FONT));
-		root.getChildren().addAll(lblBonusMoney);
+		lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
 		
 		hbxBottom.getChildren().addAll(lblResult, btnNextLock, lblBonusMoney);
 		root.getChildren().add(hbxBottom);
@@ -789,7 +808,7 @@ public class CruiseStoryGame extends Application {
 			for (int col = 0; col < visual[row].length; col++) {
 				StackPane stackGrid = new StackPane();
 				ImageView imgVisual = new ImageView(new Image(getClass().getResource("/images/" + visual[row][col] + ".png").toString()));
-				imgVisual.setFitHeight(90);
+				imgVisual.setFitHeight(95);
 				imgVisual.setPreserveRatio(true);
 				Label lblGrid = new Label("");
 				lblGrid.setFont(Font.font(SMALL_FONT));
@@ -936,7 +955,7 @@ public class CruiseStoryGame extends Application {
 	}
 	
 	private void showLastLock() {
-		final int SCREEN_WIDTH = 1000;
+		final int SCREEN_WIDTH = 700;
 		
 		VBox root = new VBox(GAP);
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
@@ -958,6 +977,7 @@ public class CruiseStoryGame extends Application {
 		btnEnterWord.setFont(Font.font(MEDIUM_FONT));
 		btnEnterWord.setOnAction(event -> enterWord());
 		hbxTop.getChildren().addAll(lblWordPrompt, txtWord, btnEnterWord);
+		BorderPane.setAlignment(hbxTop, Pos.TOP_CENTER);
 		borderWordInput.setTop(hbxTop);
 		// Right side of BorderPane
 		lblWordPyramid = new Label("");
@@ -966,6 +986,7 @@ public class CruiseStoryGame extends Application {
 		BorderPane.setAlignment(lblWordPyramid, Pos.CENTER_LEFT);
 		// Center of BorderPane
 		StackPane stackCenter = new StackPane();
+		stackCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		ImageView imgLifeBoat = new ImageView(new Image(getClass().getResource("/images/lifeBoat2.png").toString()));
 		imgLifeBoat.setFitHeight(150);
 		imgLifeBoat.setPreserveRatio(true);
@@ -1007,10 +1028,7 @@ public class CruiseStoryGame extends Application {
 		root.getChildren().add(hbxUnlocking);
 		
 		// Button to end game
-		btnEndGame = new Button("End Game");
-		btnEndGame.setFont(Font.font(MEDIUM_FONT));
 		btnEndGame.setVisible(false);
-		btnEndGame.setOnAction(event -> showMiniGamesScreen());
 		root.getChildren().addAll(lblRemainingMoney, btnEndGame);
 		
 		Window routeWindow = mainScene.getWindow();
@@ -1044,16 +1062,18 @@ public class CruiseStoryGame extends Application {
 	}
 	
 	private void showWordUnscrambleScreen() {
-		final int SCREEN_WIDTH = 1150;
+		final int SCREEN_WIDTH = 750, THIS_SCREEN_HEIGHT = 800;
 		
 		BorderPane root = new BorderPane();
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
 		// Top section
 		VBox vbxTop = new VBox(GAP);
-		lblTitle.setText(wordUnscrambleGame.toString());
+		vbxTop.setAlignment(Pos.CENTER);
+		lblTitle.setText(WordUnscramble.NAME);
 		lblInstructions.setText(WordUnscramble.showInstructions());
 		vbxTop.getChildren().addAll(lblTitle, lblInstructions);
+		BorderPane.setAlignment(vbxTop, Pos.TOP_CENTER);
 		root.setTop(vbxTop);
 		
 		// Left section
@@ -1062,44 +1082,171 @@ public class CruiseStoryGame extends Application {
 		lblBonusPtsSystem.setFont(Font.font(MEDIUM_FONT));
 		Label lblLetters = new Label("Letters: " + WordUnscramble.WORD);
 		lblLetters.setFont(Font.font(MEDIUM_FONT));
-		Label lblNumOfPossibleWords = new Label("Number of possible words: " + WordUnscramble.NUM_OF_POSSIBLE_WORDS);
+		Label lblNumOfPossibleWords = new Label("Number of possible words: " + NUM_OF_POSSIBLE_WORDS);
 		lblNumOfPossibleWords.setFont(Font.font(MEDIUM_FONT));
-		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblLetters, lblNumOfPossibleWords);
+		lblBonusMoney.setText("");
+		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblLetters, lblNumOfPossibleWords, lblBonusMoney, lblRemainingMoney);
 		root.setLeft(vbxLeft);
 		
 		// Right section
-		String strPossibleWords = "Possible Words:\n";
-		String[] possibleWords = WordUnscramble.POSSIBLE_WORDS;
-		for (int i = 0; i < possibleWords.length; i++) {
-			strPossibleWords += possibleWords[i];
-			if (i % 2 == 0) {	// even
-				strPossibleWords += "\t";
-			} else if (i != possibleWords.length - 1){
-				strPossibleWords += "\n";
-			}
-		}
-		Label lblPossibleWords = new Label(strPossibleWords);
-		lblPossibleWords.setFont(Font.font(SMALL_FONT));
-		root.setRight(lblPossibleWords);
+		VBox vbxRight = new VBox(GAP);
+		lblPossibleWords = new Label("");
+		lblPossibleWords.setFont(Font.font(MEDIUM_FONT));
+		
+		btnDone = new Button("Done");
+		btnDone.setFont(Font.font(SMALL_FONT));
+		btnDone.setOnAction(event -> checkWords());
+		vbxRight.getChildren().addAll(lblPossibleWords, btnDone);
+		BorderPane.setAlignment(vbxRight, Pos.CENTER_LEFT);
+		root.setRight(vbxRight);
 		
 		// Center section
 		GridPane gridCenter = new GridPane();
 		gridCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
-		TextField [] txtWords = new TextField[WordUnscramble.NUM_OF_POSSIBLE_WORDS];
-		ImageView [] imgOutputs = new ImageView[WordUnscramble.NUM_OF_POSSIBLE_WORDS];
+		txtWords = new TextField[NUM_OF_POSSIBLE_WORDS];
+		imgOutputs = new ImageView[NUM_OF_POSSIBLE_WORDS];
 		
-		// set imageviews to 30 height
-		for (int j = 0; j < WordUnscramble.NUM_OF_POSSIBLE_WORDS; j++) {
+		for (int j = 0; j < NUM_OF_POSSIBLE_WORDS; j++) {
+			txtWords[j] = new TextField();
+			imgOutputs[j] = new ImageView(imgBLANK);
+			imgOutputs[j].setFitHeight(35);
+			imgOutputs[j].setPreserveRatio(true);
 			
+			if (j < NUM_OF_POSSIBLE_WORDS / 2) {	// TextFields/ImageViews 1-11
+				gridCenter.add(txtWords[j], 0, j);
+				gridCenter.add(imgOutputs[j], 1, j);
+			} else {	// TextFields/ImageViews 12-22
+				gridCenter.add(txtWords[j], 2, j - (NUM_OF_POSSIBLE_WORDS / 2));
+				gridCenter.add(imgOutputs[j], 3, j - (NUM_OF_POSSIBLE_WORDS / 2));
+			}
 		}
 		
+		BorderPane.setAlignment(gridCenter, Pos.CENTER);
+		root.setCenter(gridCenter);
+		
+		// Bottom section
+		btnEndGame.setDisable(true);
+		root.setBottom(btnEndGame);
+		BorderPane.setAlignment(btnEndGame, Pos.CENTER);
+		
 		Window routeWindow = mainScene.getWindow();
-		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+		mainScene = new Scene(root, SCREEN_WIDTH, THIS_SCREEN_HEIGHT);
 		
 		if (routeWindow instanceof Stage) {
 			Stage myStage = (Stage) routeWindow;
 			myStage.setTitle("Word Unscramble");
+			myStage.setScene(mainScene);
+			myStage.show();
+		}
+	}
+	
+	private void checkWords() {
+		String[] wordsToCheck = new String[NUM_OF_POSSIBLE_WORDS];
+		final Image BLANK = new Image(getClass().getResource("/images/blankAnswer.png").toString());
+		final Image INCORRECT = new Image(getClass().getResource("/images/incorrect.png").toString());
+		final Image CORRECT = new Image(getClass().getResource("/images/correct.png").toString());
+		
+		for (int i = 0; i < NUM_OF_POSSIBLE_WORDS; i++) {
+			wordsToCheck[i] = txtWords[i].getText().trim();
+		}
+		
+		String[] results = wordUnscrambleGame.checkWords(wordsToCheck);
+		
+		for (int j = 0; j < results.length; j++) {
+			if (results[j].equals(WordUnscramble.BLANK)) {
+				imgOutputs[j].setImage(BLANK);
+			} else if (results[j].equals(WordUnscramble.CORRECT)) {
+				imgOutputs[j].setImage(CORRECT);
+			} else {
+				imgOutputs[j].setImage(INCORRECT);
+			}
+		}
+		
+		String strPossibleWords = "Possible Words:\n";
+		String[] possibleWords = WordUnscramble.POSSIBLE_WORDS;
+		for (int i = 0; i < possibleWords.length; i++) {
+			strPossibleWords += possibleWords[i];
+			if (i % 2 == 0) {	// even
+				strPossibleWords += "\t\t";
+			} else if (i != possibleWords.length - 1) {	// odd
+				strPossibleWords += "\n";
+			}
+		}
+		lblPossibleWords.setText(strPossibleWords);
+		
+		btnDone.setDisable(true);
+		btnEndGame.setDisable(false);
+		lblBonusMoney.setText(wordUnscrambleGame.showBonusAmount());
+		
+		passenger.updateTotalMoney(wordUnscrambleGame.getBonusMoney());
+		lblRemainingMoney.setText(passenger.showMoneyLeft());
+		
+	}
+	
+	private void showEndScreen() {
+		final int SCREEN_WIDTH = 1160, END_SCREEN_HEIGHT = 750;
+		final int IMG_HEIGHT = 200;
+		
+		VBox root = new VBox(GAP);
+		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		root.setAlignment(Pos.CENTER);
+		
+		// 3 Images, including result (depending on whether the player lost or won)
+		HBox hbxHeader = new HBox(GAP);
+		ImageView imgOasis = new ImageView(new Image(getClass().getResource("/images/oasisOTS.png").toString()));
+		imgOasis.setFitHeight(IMG_HEIGHT);
+		imgOasis.setPreserveRatio(true);
+		ImageView imgLogo = new ImageView(new Image(getClass().getResource("/images/logo2.png").toString()));
+		imgLogo.setFitHeight(IMG_HEIGHT);
+		imgLogo.setPreserveRatio(true);
+		ImageView imgResult = new ImageView();
+		imgResult.setFitHeight(IMG_HEIGHT);
+		imgResult.setPreserveRatio(true);
+		if (passenger.getWinStatus()) {
+			imgResult.setImage(new Image(getClass().getResource("/images/winner.png").toString()));
+		} else {
+			imgResult.setImage(new Image(getClass().getResource("/images/loser.png").toString()));
+		}
+		hbxHeader.getChildren().addAll(imgOasis, imgLogo, imgResult);
+		hbxHeader.setAlignment(Pos.CENTER);
+		root.getChildren().add(hbxHeader);
+		
+		// Info
+		lblResult.setText(passenger.showOverallResult());
+		lblResult.setFont(Font.font(XL_FONT));
+		root.getChildren().addAll(lblResult);
+		
+		// Images section
+		HBox hbxImages = new HBox(GAP);
+		ImageView imgPoolDeck = new ImageView(new Image(getClass().getResource("/images/poolDeck.png").toString()));
+		imgPoolDeck.setFitHeight(IMG_HEIGHT);
+		imgPoolDeck.setPreserveRatio(true);
+		ImageView imgBoardwalk = new ImageView(new Image(getClass().getResource("/images/boardwalkView.png").toString()));
+		imgBoardwalk.setFitHeight(IMG_HEIGHT);
+		imgBoardwalk.setPreserveRatio(true);
+		ImageView imgMiniGolfCourse = new ImageView(new Image(getClass().getResource("/images/golf.png").toString()));
+		imgMiniGolfCourse.setFitHeight(IMG_HEIGHT);
+		imgMiniGolfCourse.setPreserveRatio(true);
+		ImageView imgSailaway = new ImageView(new Image(getClass().getResource("/images/nyc.png").toString()));
+		imgSailaway.setFitHeight(IMG_HEIGHT);
+		imgSailaway.setPreserveRatio(true);
+		ImageView imgUltimateAbyss = new ImageView(new Image(getClass().getResource("/images/ultimateAbyss.png").toString()));
+		imgUltimateAbyss.setFitHeight(IMG_HEIGHT);
+		imgUltimateAbyss.setPreserveRatio(true);
+		ImageView imgShips = new ImageView(new Image(getClass().getResource("/images/oasisAndEnchantment.png").toString()));
+		imgShips.setFitHeight(IMG_HEIGHT);
+		imgShips.setPreserveRatio(true);
+		hbxImages.getChildren().addAll(imgPoolDeck, imgBoardwalk, imgMiniGolfCourse, imgSailaway, imgUltimateAbyss, imgShips);
+		hbxImages.setAlignment(Pos.CENTER);
+		root.getChildren().add(hbxImages);
+		
+		Window routeWindow = mainScene.getWindow();
+		mainScene = new Scene(root, SCREEN_WIDTH, END_SCREEN_HEIGHT);
+		
+		if (routeWindow instanceof Stage) {
+			Stage myStage = (Stage) routeWindow;
+			myStage.setTitle("End Screen");
 			myStage.setScene(mainScene);
 			myStage.show();
 		}
