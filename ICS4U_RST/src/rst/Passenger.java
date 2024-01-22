@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Passenger {
 	// Class data fields
 	public static final String[] LOYALTY_STATUSES = {"Gold", "Platinum", "Emerald", "Diamond", "Diamond Plus", "Pinnacle"};
-	public static final int START_MONEY = 2000;
+	public static final int START_MONEY = 1600;
 	
 	// Instance data fields
 	private String firstName, lastName, email, phoneNumber, loyaltyStatus;
