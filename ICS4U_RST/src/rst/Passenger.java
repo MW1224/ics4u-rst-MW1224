@@ -38,6 +38,9 @@ public class Passenger {
 	 * This overloaded constructor creates a Passenger with a no first or last name,
 	 * no loyalty status, $1650 total money; is winner true winStatus (is winner
 	 * because have positive total money left), given high score and 2 mini games left.
+	 * 
+	 * @param hScore
+	 * 			High score out of all games
 	 */
 	public Passenger(int hScore) {
 		firstName = null;
@@ -54,6 +57,18 @@ public class Passenger {
 	 * This overloaded constructor creates a Passenger with a their first and last name,
 	 * their loyalty status, $2000 total money, true winStatus (is winner because have
 	 * positive total money left), given high score; and 2 mini games left.
+	 * 
+	 * @param fName
+	 * 			User's first name
+	 * 
+	 * @param lName
+	 * 			User's last name
+	 * 
+	 * @param lStatus
+	 * 			User's loyalty status
+	 * 
+	 * @param hScore
+	 * 			High score out of all games
 	 */
 	public Passenger(String fName, String lName, String lStatus, int hScore) {
 		firstName = fName;
