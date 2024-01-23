@@ -2,6 +2,11 @@ package rst;
 
 import java.util.ArrayList;
 
+/**
+ * The <code>EscapeRoom</code> class, a subclass of the <code>MiniGame</code> class, manages
+ * the logic of the Royal Escape Room mini game. It contains the locks left for the user to pick, as
+ * well as the pyramid output for the final lock.
+ */
 public class EscapeRoom extends MiniGame {
 	public static final String NAME = "Royal Escape Room";
 	public static final int START_BONUS = 20, INCORRECT_FEE = 6, HINT_FEE = 3;
