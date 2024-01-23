@@ -30,7 +30,7 @@ public class RouteCard extends Button {
 			ARABIAN_GULF, MEDITERRANEAN};
 	public static final String[] ROUTE_NAMES = {"Scandinavia", "South America", "West Coast", "Asia", "British Isles",
 			"Hawaii", "Mexico", "Panama Canal", "Alaska", "Caribbean", "East Coast", "South Pacific", "Greek Isles",
-			"Perfect Day at CocoCay", "Arabian Gulf", "Mediterranean"};
+			"P.D. at CocoCay", "Arabian Gulf", "Mediterranean"};
 	public static final int[] ROUTE_COSTS = {1470, 1430, 1360, 1450, 1410, 1490, 1370, 1400, 1440, 1390, 1350,
 			1460, 1480, 1380, 1420, 1500};
 	
