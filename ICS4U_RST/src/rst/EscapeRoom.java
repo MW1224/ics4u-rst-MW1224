@@ -8,20 +8,21 @@ import java.util.ArrayList;
  * well as the pyramid output for the final lock.
  */
 public class EscapeRoom extends MiniGame {
+	// Class data fields
 	public static final String NAME = "Royal Escape Room";
-	public static final int START_BONUS = 20, INCORRECT_FEE = 6, HINT_FEE = 3;
-	public static final int [] LOCK_NUMS = {2, 1, 3, 5, 4};
-	private static final String[] FIRST_FIVE_LOCK_COMBOS = {"16", "6", "10210", "312", "2610"};
+	public static final int START_BONUS = 20;	// user starts with $20 bonus money
+	public static final int INCORRECT_FEE = 6, HINT_FEE = 3;	// user loses $6 for each incorrect attempt, $3 for every hint in bonus money
+	public static final int [] LOCK_NUMS = {2, 1, 3, 5, 4};		// actual order of locks (#'s) to match each subsequent clue (1-5) in the game
+	private static final String[] FIRST_FIVE_LOCK_COMBOS = {"16", "6", "10210", "312", "2610"};		// lock combos for locks 1-5 (in order)
 	private static final String[] LOCK_CLUES = {"Passenger decks on Oasis of the Seas", "Ignore the pink and green beach umbrellas",
 			"Oasis of the Seas (it's not the rows...)", "'Life is better on a cruise' - I,A,S", "Only formal nights (left -> right; top -> bottom)"
-			, "Height of pyramid"};
+			, "Height of pyramid"};		// lock clues for locks 1-5 (in order)
 	private static final String[] LOCK_HINTS = {"Lock 1 - Do a quick Google search!", "Lock 2 - Number of blue beach umbrellas.",
 			"Lock 3 - Number of times Oasis OTS appears in each column.", "Lock 4  - Number of times each letter (i/a/s) appears.",
 			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom - each night # increments by 1",
-			"Pyramid's number of rows."};
-	private static final String UNLOCKED = "UNLOCKED", LOCKED = "LOCKED";
+			"Pyramid's number of rows."};	// lock hints for locks 1-5 (in order)
 	private static final Lock[] LOCKS = new Lock[6];
-	private static final int[] LOCK_INDICES = {0, 1, 0, 0, 1};
+	private static final int[] LOCK_INDICES = {0, 1, 0, 0, 1};	// 
 	
 	private ArrayList<Lock> allLocks;
 	private ArrayList<String> pyramidOutput = new ArrayList<String>();
@@ -79,12 +80,7 @@ public class EscapeRoom extends MiniGame {
 	}
 	
 	public String getStrLockState(int lockNum) {
-		Lock lock = LOCKS[lockNum - 1];
-		if (lock.isOpen()) {
-			return UNLOCKED;
-		} else {
-			return LOCKED;
-		}
+		return LOCKS[lockNum - 1].getStrState();
 	}
 	
 	public boolean getLockState(int lockNum) {
