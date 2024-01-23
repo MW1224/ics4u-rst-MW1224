@@ -47,7 +47,7 @@ public class ActivitiesScenario extends Scenario {
 	}
 	
 	/**
-	 * Returns a string that shows the total cost of the activities performed.
+	 * This overridden method returns a string that shows the total cost of the activities performed.
 	 * 
 	 * @return A <code>String</code> representing the total cost of the activities performed.
 	 */
