@@ -3,13 +3,13 @@ package rst;
 import java.util.ArrayList;
 
 /**
- * The <code>Passenger</code> class holds the player/passenger's personal information (their first name, last name,
- * email, phone number
+ * The <code>Passenger</code> class holds the passenger's information and handles the logic of the game.
+ * It holds the 
  */
 public class Passenger {
 	// Class data fields
 	public static final String[] LOYALTY_STATUSES = {"Gold", "Platinum", "Emerald", "Diamond", "Diamond Plus", "Pinnacle"};
-	public static final int START_MONEY = 1600;
+	public static final int START_MONEY = 1650;		// Passenger starts with $1650
 	
 	// Instance data fields
 	private String firstName, lastName, loyaltyStatus;
