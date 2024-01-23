@@ -41,6 +41,14 @@ public class Lock {
 		return state;
 	}
 	
+	public String getStrState() {
+		if (state) {
+			return "UNLOCKED";
+		} else {
+			return "LOCKED";
+		}
+	}
+	
 	public String getCombo() {
 		return combo;
 	}
