@@ -188,69 +188,113 @@ public class Passenger {
 		lastName = lName;
 	}
 	
+	/**
+	 * This setter/mutator method sets the passenger's loyalty status.
+	 * 
+	 * @param lStatus
+	 * 			The passenger's loyalty status.
+	 */
 	public void setLoyaltyStatus(String lStatus) {
 		loyaltyStatus = lStatus;
 	}
 	
+	/**
+	 * Returns a string that represents the high score out of all games stored in Passenger object.
+	 * 
+	 * @return A <code>String</code> representing the high score out of all games stored in Passenger object.
+	 */
 	public String showHighScore() {
 		return "High score (out of all games): $" + highScore;
 	}
 	
+	/**
+	 * This getter/accessor method returns the high score out of all games.
+	 * 
+	 * @return An <code>int</code> containing the high score out of all games.
+	 */
 	public int getHighScore() {
 		return highScore;
 	}
 	
+	/**
+	 * Resets the high score out of all games to 0;
+	 */
 	public void resetHighScore() {
 		highScore = 0;
 	}
 	
+	/**
+	 * This getter/accessor method returns the passenger's win status (true if positive money left,
+	 * false if negative money left).
+	 * 
+	 * @return A <code>boolean</code> containing the passenger's win status.
+	 */
 	public boolean getWinStatus() {
 		return winStatus;
 	}
 	
+	/**
+	 * Returns a string that represents the Cruise Story Game's results. If the passenger lost, their loyalty
+	 * status will drop to the level below (unless they're already at the lowest level of GOLD). If the passenger
+	 * won, their loyalty status will increase to the level above (unless they're already at the top level of
+	 * PINACCLE). Indicates if passenger won or lost, their final remaining money, lets them know if they set
+	 * a new high score (if it's higher than the current high score) and outputs high score out of all games.
+	 * 
+	 * @return A <code>String</code> representing the Cruise Story Game's results.
+	 */
 	public String showOverallResult() {
-		String result = firstName + " " + lastName + " ";
-		int loyaltyStatusIndex = 0;
+		String result = firstName + " " + lastName + " ";	// add passenger's first and last name to result
+		int loyaltyStatusIndex = 0;		// index of passenger's current loyalty status in the array of loyalty statuses
 		
 		// Get loyalty status index
 		for (int i = 0; i < LOYALTY_STATUSES.length; i++) {
 			if (loyaltyStatus.equals(LOYALTY_STATUSES[i])) {
-				loyaltyStatusIndex = i;
+				loyaltyStatusIndex = i;		// set the index to the passenger's loyalty status's index
 			}
 		}
 		
+		// Output different results depending on whether or not the passenger won
 		if (winStatus) {
 			result += "won!\n";
-			if (loyaltyStatusIndex != LOYALTY_STATUSES.length - 1) {
-				result += "You've been upgraded from " + loyaltyStatus + " to ";
-				setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex + 1]);
-			} else {
-				result += "You have maintained your status of ";
+			
+			// Show updated loyalty status
+			if (loyaltyStatusIndex != LOYALTY_STATUSES.length - 1) {	// if loyalty status isn't already the highest level
+				result += "You've been upgraded from " + loyaltyStatus + " to ";	// show upgraded message
+				setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex + 1]);		// set their loyalty status to the level above their current one
+			} else {	// if loyalty status is the highest level of PINNACLE
+				result += "You have maintained your status of ";	// show maintained status message
 			}
 		} else {
 			result += "lost!\n";
-			if (loyaltyStatusIndex != 0) {
-				result += "You've been degraded from " + loyaltyStatus + " to ";
-				setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex - 1]);
-			} else {
-				result += "You still have the lowest status of ";
+			
+			// Show update loyalty status
+			if (loyaltyStatusIndex != 0) {	// if loyalty status isn't already the lowest level
+				result += "You've been degraded from " + loyaltyStatus + " to ";	// show degraded message
+				setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex - 1]);		// set their loyalty status to the level below their current one
+			} else {	// if loyalty status is the lowest level of GOLD
+				result += "You still have the lowest status of ";	// show maintained status message
 			}
 		}
 		
+		// Add updated/maintained loyalty status & final remaining money to result output
 		result += loyaltyStatus + "!\nYou had $" + totalMoney + " left.\n";
 		
-		if (totalMoney > highScore) {
-			highScore = totalMoney;
-			result += "You set a new high score!\n";
+		// Add a message if the passenger set a new high score
+		if (totalMoney > highScore) {	// if this passenger's remaining money is greater than the current high score
+			highScore = totalMoney;		// set their remaining money as the current high score
+			result += "You set a new high score!\n";	// add message
 		}
 		
+		// Add current high score to result output
 		result += showHighScore();
 		
 		return result;
 	}
 	
 	/**
+	 * This overridden method returns a String that represents the Passenger object.
 	 * 
+	 * @return A <code>String</code> representing the Passenger object.
 	 */
 	public String toString() {
 		String passengerString = firstName + " " + lastName + "\nLoyalty Status: "
