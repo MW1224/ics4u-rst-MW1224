@@ -3,7 +3,8 @@ package rst;
 import java.util.ArrayList;
 
 /**
- * The <code>Passenger</code> class
+ * The <code>Passenger</code> class holds the player/passenger's personal information (their first name, last name,
+ * email, phone number
  */
 public class Passenger {
 	// Class data fields
@@ -11,7 +12,7 @@ public class Passenger {
 	public static final int START_MONEY = 1600;
 	
 	// Instance data fields
-	private String firstName, lastName, email, phoneNumber, loyaltyStatus;
+	private String firstName, lastName, loyaltyStatus;
 	private int totalMoney, highScore;
 	private boolean winStatus;
 	private ArrayList<String> miniGamesLeft = new ArrayList<String>();
@@ -25,8 +26,6 @@ public class Passenger {
 	public Passenger() {
 		firstName = null;
 		lastName = null;
-		email = null;
-		phoneNumber = null;
 		loyaltyStatus = null;
 		totalMoney = START_MONEY;
 		highScore = 0;
@@ -37,15 +36,13 @@ public class Passenger {
 	
 	/**
 	 * This overloaded constructor creates a Passenger with a no
-	 * first name, last name, email, phone number and loyalty status;
+	 * first name, last name and loyalty status;
 	 * $2000 total money; is winner (because have total points left); 
 	 * given high score; and 2 mini games left.
 	 */
 	public Passenger(int hScore) {
 		firstName = null;
 		lastName = null;
-		email = null;
-		phoneNumber = null;
 		loyaltyStatus = null;
 		totalMoney = START_MONEY;
 		highScore = hScore;
@@ -60,11 +57,9 @@ public class Passenger {
 	 * $2000 total money; is winner (because have total points left);
 	 * given high score; and 2 mini games left.
 	 */
-	public Passenger(String fName, String lName, String email, String phoneNum, String lStatus, int hScore) {
+	public Passenger(String fName, String lName, String lStatus, int hScore) {
 		firstName = fName;
 		lastName = lName;
-		this.email = email;
-		phoneNumber = phoneNum;
 		loyaltyStatus = lStatus;
 		totalMoney = START_MONEY;
 		highScore = hScore;
@@ -115,8 +110,8 @@ public class Passenger {
 	}
 	
 	public String toString() {
-		String passengerString = firstName + " " + lastName + "\n" + email + "\n" + phoneNumber + "\nLoyalty Status: " + loyaltyStatus
-				+ "\nTotal Money: " + totalMoney;
+		String passengerString = firstName + " " + lastName + "\nLoyalty Status: "
+				+ loyaltyStatus + "\nTotal Money: " + totalMoney;
 		return passengerString;
 	}
 	
@@ -134,14 +129,6 @@ public class Passenger {
 	
 	public void setLastName(String lName) {
 		lastName = lName;
-	}
-	
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	public void setPhoneNumber(String phoneNum) {
-		phoneNumber = phoneNum;
 	}
 	
 	public void setLoyaltyStatus(String lStatus) {
@@ -166,14 +153,29 @@ public class Passenger {
 	
 	public String showOverallResult() {
 		String result = firstName + " " + lastName + " ";
+		int loyaltyStatusIndex = 0;
 		
-		if (winStatus) {
-			result += "won!";
-		} else {
-			result += "lost!";
+		// Get loyalty status index
+		for (int i = 0; i < LOYALTY_STATUSES.length; i++) {
+			if (loyaltyStatus.equals(LOYALTY_STATUSES[i])) {
+				loyaltyStatusIndex = i;
+			}
 		}
 		
-		result += "\nYou had $" + totalMoney + " left.\n";
+		if (winStatus) {
+			result += "won!\n";
+			if (loyaltyStatusIndex != LOYALTY_STATUSES.length - 1) {
+				result += "You've been upgraded from " + loyaltyStatus + " to ";
+				setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex + 1]);
+			} else {
+				result += "You have maintained your status of ";
+			}
+		} else {
+			result += "lost!\nYou've been degraded from " + loyaltyStatus + " to ";
+			setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex - 1]);
+		}
+		
+		result += loyaltyStatus + "!\nYou had $" + totalMoney + " left.\n";
 		
 		if (totalMoney > highScore) {
 			highScore = totalMoney;
