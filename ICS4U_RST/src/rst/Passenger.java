@@ -171,8 +171,13 @@ public class Passenger {
 				result += "You have maintained your status of ";
 			}
 		} else {
-			result += "lost!\nYou've been degraded from " + loyaltyStatus + " to ";
-			setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex - 1]);
+			result += "lost!\n";
+			if (loyaltyStatusIndex != 0) {
+				result += "You've been degraded from " + loyaltyStatus + " to ";
+				setLoyaltyStatus(LOYALTY_STATUSES[loyaltyStatusIndex - 1]);
+			} else {
+				result += "You still have the lowest status of ";
+			}
 		}
 		
 		result += loyaltyStatus + "!\nYou had $" + totalMoney + " left.\n";
