@@ -35,7 +35,7 @@ public class Passenger {
 	}
 	
 	/**
-	 * This overloaded constructor creates a Passenger with a no first or last name,
+	 * This overloaded constructor creates a Passenger with no first or last name,
 	 * no loyalty status, $1650 total money; is winner true winStatus (is winner
 	 * because have positive total money left), given high score and 2 mini games left.
 	 * 
