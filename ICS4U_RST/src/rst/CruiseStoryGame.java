@@ -437,9 +437,6 @@ public class CruiseStoryGame extends Application {
 			Label lblActivity = new Label(ITEMS[i] + "  ");
 			lblActivity.setFont(Font.font(SMALL_FONT));
 			
-			/*spnItemQuantities.add(i, new Spinner<Integer>());
-			Spinner<Integer> spnItemQuantity = spnItemQuantities.get(i);*/
-			
 			Spinner<Integer> spnItemQuantity = new Spinner<Integer>();
 			spnItemQuantity.setValueFactory(valueFactory);
 			itemQuantities[i] = spnItemQuantity.getValue();
@@ -461,40 +458,6 @@ public class CruiseStoryGame extends Application {
 				vbxCol3.getChildren().add(hbxRow);
 			}	
 		}
-		
-		/*itemIndex = 0;
-		while (itemIndex < PackingScenario.NUM_OF_ITEMS) {
-			HBox hbxRow = new HBox(GAP);
-			SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
-			valueFactory.setValue(0);
-			
-			Label lblActivity = new Label(ITEMS[itemIndex] + "  ");
-			lblActivity.setFont(Font.font(SMALL_FONT));
-			
-			spnItemQuantities.add(itemIndex, new Spinner<Integer>());
-			Spinner<Integer> spnItemQuantity = spnItemQuantities.get(itemIndex);
-			
-			spnItemQuantity.setValueFactory(valueFactory);
-			itemQuantities[itemIndex] = spnItemQuantity.getValue();
-			
-			spnItemQuantity.valueProperty().addListener(new ChangeListener<Integer>() {
-				public void changed(ObservableValue<? extends Integer> ov, Integer old_val, Integer new_val) {
-					itemQuantities[spnItemQuantities.indexOf(spnItemQuantity)] = spnItemQuantity.getValue();
-				}
-			});
-			
-			hbxRow.getChildren().addAll(lblActivity, spnItemQuantity);
-			
-			if (itemIndex < FIRST_ROWS_ITEMS) {
-				vbxCol1.getChildren().add(hbxRow);
-			} else if (itemIndex >= FIRST_ROWS_ITEMS && itemIndex < FIRST_ROWS_ITEMS * 2) {
-				vbxCol2.getChildren().add(hbxRow);
-			} else {
-				vbxCol3.getChildren().add(hbxRow);
-			}
-			
-			itemIndex++;	// increment index
-		}*/
 		
 		// Suitcase output in the third VBox (3rd column)
 		StackPane stackSuitcase = new StackPane();
@@ -1071,21 +1034,21 @@ public class CruiseStoryGame extends Application {
 		vbxTop.setAlignment(Pos.CENTER);
 		lblTitle.setText(WordUnscramble.NAME);
 		lblInstructions.setText(WordUnscramble.showInstructions());
-		vbxTop.getChildren().addAll(lblTitle, lblInstructions);
+		Label lblLetters = new Label("Letters: " + WordUnscramble.WORD);
+		lblLetters.setFont(Font.font(MEDIUM_FONT));
+		lblLetters.setTextFill(Color.MEDIUMORCHID);
+		vbxTop.getChildren().addAll(lblTitle, lblInstructions, lblLetters);
 		BorderPane.setAlignment(vbxTop, Pos.TOP_CENTER);
 		root.setTop(vbxTop);
 		
 		// Left section
 		VBox vbxLeft = new VBox(GAP);
-		vbxLeft.setAlignment(Pos.CENTER_RIGHT);
 		Label lblBonusPtsSystem = new Label(WordUnscramble.showPointsSystem());
 		lblBonusPtsSystem.setFont(Font.font(MEDIUM_FONT));
-		Label lblLetters = new Label("Letters: " + WordUnscramble.WORD);
-		lblLetters.setFont(Font.font(MEDIUM_FONT));
 		Label lblNumOfPossibleWords = new Label("Number of possible words: " + NUM_OF_POSSIBLE_WORDS);
 		lblNumOfPossibleWords.setFont(Font.font(MEDIUM_FONT));
 		lblBonusMoney.setText("");
-		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblLetters, lblNumOfPossibleWords, lblBonusMoney, lblRemainingMoney);
+		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblNumOfPossibleWords, lblBonusMoney, lblRemainingMoney);
 		BorderPane.setAlignment(vbxLeft, Pos.CENTER);
 		root.setLeft(vbxLeft);
 		
