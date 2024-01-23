@@ -50,11 +50,11 @@ public class CruiseStoryGame extends Application {
 	private static final int GAP = 10, SMALL_GAP = 3;
 	private static final int SCREEN_HEIGHT = 900;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
-	private final Image CLOSED_LOCK = new Image(getClass().getResource("/images/closedLock.png").toString());
-	private final Image OPEN_LOCK = new Image(getClass().getResource("/images/openLock.png").toString());
-	private final int LOCK_NUM_INDEX = 5;
-	private final Image imgBLANK = new Image(getClass().getResource("/images/white.png").toString());
-	private final int NUM_OF_POSSIBLE_WORDS = WordUnscramble.NUM_OF_POSSIBLE_WORDS;
+	private static final Image CLOSED_LOCK = new Image(CruiseStoryGame.class.getResource("/images/closedLock.png").toString());
+	private static final Image OPEN_LOCK = new Image(CruiseStoryGame.class.getResource("/images/openLock.png").toString());
+	private static final int LOCK_NUM_INDEX = 5;
+	private static final Image imgBLANK = new Image(CruiseStoryGame.class.getResource("/images/white.png").toString());
+	private static final int NUM_OF_POSSIBLE_WORDS = WordUnscramble.NUM_OF_POSSIBLE_WORDS;
 	
 	// Input/output UI controls & global variables
 	private Passenger passenger;
@@ -64,7 +64,7 @@ public class CruiseStoryGame extends Application {
 	private Button btnEndGame, btnStartCruise;
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
-	private TextField txtFirstName, txtLastName, txtEmail, txtPhoneNumber;
+	private TextField txtFirstName, txtLastName;
 	private ChoiceBox<String> chcLoyaltyStatus;
 	private Scene mainScene;
 	// For Cruise Route Random Selection screen
@@ -210,41 +210,27 @@ public class CruiseStoryGame extends Application {
 		// TextField for passenger's first name
 		txtLastName = new TextField();
 		gridPassengerInfo.add(txtLastName, 8, 1, 2, 1);	// pos (8,1), colspan = 2, rowspan = 1
-		// Label for passenger's email
-		Label lblEmail = new Label("Email:");
-		lblEmail.setFont(Font.font(MEDIUM_FONT));
-		gridPassengerInfo.add(lblEmail, 1, 2);	// pos (1,2), colspan = 1, rowspan = 1
-		// TextField for passenger's email
-		txtEmail = new TextField();
-		gridPassengerInfo.add(txtEmail, 2, 2, 2, 1);	// pos (2,2), colspan = 2, rowspan = 1
-		// Label for passenger's phone number
-		Label lblPhoneNumber = new Label("Phone number:");
-		lblPhoneNumber.setFont(Font.font(MEDIUM_FONT));
-		gridPassengerInfo.add(lblPhoneNumber, 6, 2, 2, 1);	// pos (6,2), colspan = 2, rowspan = 1
-		// TextField for passenger's phone number
-		txtPhoneNumber = new TextField();
-		gridPassengerInfo.add(txtPhoneNumber, 8, 2, 2, 1);	// pos (8,2), colspan = 2, rowspan = 1
 		// Label for passenger's loyalty status
 		Label lblLoyaltyStatus = new Label("Crown & Anchor Society status:");
 		lblLoyaltyStatus.setFont(Font.font(MEDIUM_FONT));
-		gridPassengerInfo.add(lblLoyaltyStatus, 1, 3, 2, 1);	// pos (1,3), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(lblLoyaltyStatus, 1, 2, 2, 1);	// pos (1,3), colspan = 2, rowspan = 1
 		// ChoiceBox for loyalty status options
 		chcLoyaltyStatus = new ChoiceBox<String>();
 		chcLoyaltyStatus.getItems().addAll(Passenger.LOYALTY_STATUSES);
-		gridPassengerInfo.add(chcLoyaltyStatus, 3, 3, 2, 1);	// pos (3,3), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(chcLoyaltyStatus, 3, 2, 2, 1);	// pos (3,3), colspan = 2, rowspan = 1
 		// Label to display overall high score between all games played before
 		lblHighScore = new Label(passenger.showHighScore());
 		lblHighScore.setFont(Font.font(MEDIUM_FONT));
-		gridPassengerInfo.add(lblHighScore, 1, 4, 2, 1);	// pos (1,4), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(lblHighScore, 1, 3, 2, 1);	// pos (1,4), colspan = 2, rowspan = 1
 		// Button for event handler to reset high score out of all games played to $0
 		Button btnResetHighScore = new Button("Reset high score counter");
 		btnResetHighScore.setFont(Font.font(SMALL_FONT));
-		gridPassengerInfo.add(btnResetHighScore, 4, 4, 2, 1);	// pos (4,4), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(btnResetHighScore, 4, 3, 2, 1);	// pos (4,4), colspan = 2, rowspan = 1
 		btnResetHighScore.setOnAction(event -> resetHighScore());
 		// Button for event handler to create passenger with their information
 		Button btnFinish = new Button("Done entering info");
 		btnFinish.setFont(Font.font(SMALL_FONT));
-		gridPassengerInfo.add(btnFinish, 8, 4, 2, 1);	// pos (8,4), colspan = 1, rowspan = 1
+		gridPassengerInfo.add(btnFinish, 8, 3, 2, 1);	// pos (8,4), colspan = 1, rowspan = 1
 		btnFinish.setOnAction(event -> addPassengerInfo());
 		// Add this GridPane to the VBox root
 		gridPassengerInfo.setAlignment(Pos.CENTER);
@@ -269,22 +255,18 @@ public class CruiseStoryGame extends Application {
 	}
 	
 	private void addPassengerInfo() {
-		String firstName, lastName, email, phoneNumber, loyaltyStatus;
+		String firstName, lastName, loyaltyStatus;
 		firstName = txtFirstName.getText().trim();
 		lastName = txtLastName.getText().trim();
-		email = txtEmail.getText().trim();
-		phoneNumber = txtLastName.getText().trim();
 		loyaltyStatus = chcLoyaltyStatus.getValue();
 		
-		if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || loyaltyStatus == null) {
+		if (firstName.isEmpty() || lastName.isEmpty() || loyaltyStatus == null) {
 			lblErrorMessage.setText("Please enter information in all fields! (no empty boxes)");
 			return;
 		}
 		
 		passenger.setFirstName(firstName);
 		passenger.setLastName(lastName);
-		passenger.setEmail(email);
-		passenger.setPhoneNumber(phoneNumber);
 		passenger.setLoyaltyStatus(loyaltyStatus);
 		
 		showCruiseRouteScreen();
@@ -983,6 +965,7 @@ public class CruiseStoryGame extends Application {
 		BorderPane borderWordInput = new BorderPane();
 		// Top of BorderPane
 		HBox hbxTop = new HBox(GAP);
+		hbxTop.setAlignment(Pos.CENTER);
 		Label lblWordPrompt = new Label("Enter a word:");
 		lblWordPrompt.setFont(Font.font(MEDIUM_FONT));
 		txtWord = new TextField();
@@ -994,9 +977,9 @@ public class CruiseStoryGame extends Application {
 		borderWordInput.setTop(hbxTop);
 		// Right side of BorderPane
 		lblWordPyramid = new Label("");
+		lblWordPyramid.setAlignment(Pos.CENTER_LEFT);
 		lblWordPyramid.setFont(Font.font(MEDIUM_FONT));
 		borderWordInput.setRight(lblWordPyramid);
-		BorderPane.setAlignment(lblWordPyramid, Pos.CENTER_LEFT);
 		// Center of BorderPane
 		StackPane stackCenter = new StackPane();
 		stackCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
@@ -1010,6 +993,7 @@ public class CruiseStoryGame extends Application {
 		BorderPane.setAlignment(stackCenter, Pos.CENTER);
 		// Bottom of BorderPane
 		VBox vbxBottom = new VBox(GAP);
+		vbxBottom.setAlignment(Pos.CENTER);
 		lblClue.setText("Clue: " + royalEscapeRoom.getLockClue(chosenLockNum));
 		Button btnHint = new Button("Get Hint");
 		btnHint.setFont(Font.font(SMALL_FONT));
@@ -1022,6 +1006,7 @@ public class CruiseStoryGame extends Application {
 		
 		// Section for lock combo
 		HBox hbxLockCombo = new HBox(GAP);
+		hbxLockCombo.setAlignment(Pos.CENTER);
 		// Label for lock combo prompt
 		Label lblComboPrompt = new Label("Enter lock combination:");
 		lblComboPrompt.setFont(Font.font(MEDIUM_FONT));
@@ -1033,6 +1018,7 @@ public class CruiseStoryGame extends Application {
 		
 		// Section for unlocking/output
 		HBox hbxUnlocking = new HBox(GAP);
+		hbxUnlocking.setAlignment(Pos.CENTER);
 		// Button for event handler
 		btnUnlock.setVisible(false);
 		// Label for result output
@@ -1091,6 +1077,7 @@ public class CruiseStoryGame extends Application {
 		
 		// Left section
 		VBox vbxLeft = new VBox(GAP);
+		vbxLeft.setAlignment(Pos.CENTER_RIGHT);
 		Label lblBonusPtsSystem = new Label(WordUnscramble.showPointsSystem());
 		lblBonusPtsSystem.setFont(Font.font(MEDIUM_FONT));
 		Label lblLetters = new Label("Letters: " + WordUnscramble.WORD);
@@ -1229,9 +1216,10 @@ public class CruiseStoryGame extends Application {
 		
 		for (int i = 0; i < NUM_OF_ACTIVITIES; i++) {
 			imgActivities[i] = new ImageView(new Image(getClass().getResource("/images/activity" + i + ".png").toString()));
-			imgActivities[i].setFitHeight(65);
+			imgActivities[i].setFitHeight(70);
 			imgActivities[i].setPreserveRatio(true);
 			lblActivity = new Label(ActivitiesScenario.ACTIVITIES[i] + " ($" + i + "):");
+			lblActivity.setFont(Font.font(MEDIUM_FONT));
 			txtNumsPerActivities[i] = new TextField();
 			
 			if (i < HALF) {	// TextFields/ImageViews 1-7
@@ -1301,6 +1289,7 @@ public class CruiseStoryGame extends Application {
 		
 		activitiesScenario.calculateCost();
 		
+		lblErrorMessage.setText("");
 		lblResult.setText(activitiesScenario.showChangeInMoney());
 		
 		passenger.updateTotalMoney(activitiesScenario.getChangeInMoney());
