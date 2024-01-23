@@ -1,9 +1,9 @@
 package rst;
 
 /**
- * The <code>ActivitiesScenario</code> class, a subclass of the Scenario class, handles the logic of
- * an activities scenario. It calculates the change in money based on the number of times each activity
- * is performed by the passenger.
+ * The <code>ActivitiesScenario</code> class, a subclass of the <code>Scenario</code> class, handles
+ * the logic of an activities scenario. It calculates the change in money based on the number of times
+ * each activity is performed by the passenger.
  */
 public class ActivitiesScenario extends Scenario {
 
