@@ -1080,7 +1080,7 @@ public class CruiseStoryGame extends Application {
 		lblResult.setText(royalEscapeRoom.attemptUnlock(chosenLockNum, actualLockNum, code));
 		
 		// Process/adjust output controls depending on chosen lock's state (unlocked/locked)
-		if (royalEscapeRoom.getLockState(chosenLockNum) || chosenLockNum == 6) {	// if unlocked
+		if (royalEscapeRoom.getLockState(chosenLockNum)) {	// if unlocked
 			btnHint.setDisable(true);	// disable hint Button to prevent invalid input
 			
 			// Output/processing is different for last/6th special lock
