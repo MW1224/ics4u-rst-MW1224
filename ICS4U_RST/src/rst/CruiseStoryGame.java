@@ -1091,7 +1091,7 @@ public class CruiseStoryGame extends Application {
 			} else {	// if 6th lock
 				imgLock.setImage(OPEN_LOCK);	// change image of lock to open lock
 				btnEndGame.setVisible(true);	// allow user to finish Royal Escape Room mini game
-				lblBonusMoney.setText("Your final bonus money is $" + royalEscapeRoom.getBonusMoney());	// output final bonus money
+				lblBonusMoney.setText("Your final bonus money is $" + royalEscapeRoom.getBonusMoney() + ".");	// output final bonus money
 				
 				// Update remaining money & output to passenger
 				passenger.updateTotalMoney(royalEscapeRoom.getBonusMoney());
