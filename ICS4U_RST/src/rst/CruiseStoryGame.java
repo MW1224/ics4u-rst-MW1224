@@ -9,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -79,7 +78,7 @@ public class CruiseStoryGame extends Application {
 	private ImageView imgLock;
 	private HBox hbxSliders;
 	private Label lblClue, lblLockNum, lblLockState, lblHint, lblWordPyramid;
-	private Button btnHint, btnNextLock;
+	private Button btnHint, btnNextLock, btnEnterWord;
 	private ChoiceBox<String> chcLocks;
 	private GridPane gridVisual;
 	private TextField txtWord, txtLockCombo;
@@ -388,7 +387,7 @@ public class CruiseStoryGame extends Application {
 		root.setBottom(lblRoute);
 		BorderPane.setAlignment(lblRoute, Pos.CENTER);
 		
-		// Change the scene graph of the previous stage
+		// Change the scene graph of the previous stage to this one
 		Window mainWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
@@ -411,16 +410,18 @@ public class CruiseStoryGame extends Application {
 		// Select this route card
 		temp.selectRouteCard();
 		
-		// Change remaining money left
-		boolean disabledCard = temp.getState();
+		// Make sure card isn't disabled (that means route has already been chosen)
+		boolean disabledCard = temp.getState();	// true if card is disabled, false if not disabled
+		
+		// Change remaining money left if card isn't disabled
 		if (!disabledCard) {
 			passenger.updateTotalMoney(temp.getCost());
 			lblRemainingMoney.setText(passenger.showMoneyLeft());
 					
-			lblRoute.setText(temp.showResult());
+			lblRoute.setText(temp.showResult());	// output route and its cost
 		}
 		
-		// Disable all cards so user can only select one route
+		// Disable all cards so user only selects that one route
 		for (int row = 0; row < routeGrid.length; row++) {
 			for (int col = 0; col < routeGrid[row].length; col++) {
 				routeGrid[row][col].disableCard();
@@ -428,17 +429,23 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
+	/**
+	 * Method to show the Packing Scenario screen - event handler method for
+	 * the "Next" Button. Also, validates that user actually selected a route from previous
+	 * screen (Cruise Route Random Selection).
+	 */
 	private void showPackingScenarioScreen() {
 		// Local constants
 		final int SCREEN_WIDTH = 1200;
-		final int FIRST_ROWS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 7)/2;
+		final int FIRST_COLS_ITEMS = (PackingScenario.NUM_OF_ITEMS - 7)/2;	// the number of textfields/packing items in the first two columns
 		final String[] ITEMS = PackingScenario.getItems();
 				
 		// Local variables
-		boolean noRouteSelected = true;
+		boolean noRouteSelected = true;	
 		packingScenario = new PackingScenario();
 		
 		// Make sure user selected a route from previous scene
+		// If a card is disabled, that means a route was selected
 		for (int row = 0; row < routeGrid.length; row++) {
 			for (int col = 0; col < routeGrid[row].length; col++) {
 				if (routeGrid[row][col].getState()) {	// if card is disabled
@@ -450,6 +457,7 @@ public class CruiseStoryGame extends Application {
 		// User hasn't clicked "Finish Packing" button yet
 		eventDone = false;
 		
+		// Output error message if passenger hasn't selected a route yet
 		if (noRouteSelected) {
 			lblRoute.setText("Error: You must select a route before moving on");
 			return;
@@ -464,72 +472,90 @@ public class CruiseStoryGame extends Application {
 		lblTitle.setText(packingScenario.toString());
 		root.getChildren().add(lblTitle);
 		
-		// Label to show weight limit
+		// Add Label to show weight limit
 		Label lblWeightLimit = new Label(PackingScenario.showWeightLimit());
 		lblWeightLimit.setFont(Font.font(MEDIUM_FONT));
+		root.getChildren().add(lblWeightLimit);
 		
 		// Add Label to show instructions
 		lblInstructions.setText(PackingScenario.showInstructions());
-		lblInstructions.setFont(Font.font(MEDIUM_FONT));
-		root.getChildren().addAll(lblWeightLimit, lblInstructions);
+		root.getChildren().add(lblInstructions);
 		
-		// Add HBox for 3 columns of activities and suitcase image showing its current weight
-		HBox hbxItems = new HBox(GAP * 2);
+		// Add HBox for 3 columns (VBox) of activities and suitcase image showing its current weight
+		HBox hbxItems = new HBox(GAP * 2);	// Parent HBox to hold 3 VBoxes
+		hbxItems.setAlignment(Pos.CENTER);
+		
+		// Three VBoxes to hold individual HBoxes for each item
 		VBox vbxCol1 = new VBox(SMALL_GAP), vbxCol2 = new VBox(SMALL_GAP), vbxCol3 = new VBox(SMALL_GAP);
 		
+		// Instantiate an ArrayList of Integer Spinners to obtain user input for all packing items
 		ArrayList<Spinner<Integer>> spnItemQuantities = new ArrayList<Spinner<Integer>>();
-		itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];
+		itemQuantities = new int[PackingScenario.NUM_OF_ITEMS];	// this is where the values of the spinners will be stored
 		
+		// For each packing item, add an HBox with a label and spinner to its VBox column
 		for (int i = 0; i < itemQuantities.length; i++) {
-			HBox hbxRow = new HBox(GAP);
+			HBox hbxRow = new HBox(GAP);	// HBox one of the three VBoxes
+			
+			// Instantiate Value Factory for Spinner (0 to 100) and set the default to 0
 			SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
 			valueFactory.setValue(0);
 			
-			Label lblActivity = new Label(ITEMS[i] + "  ");
-			lblActivity.setFont(Font.font(SMALL_FONT));
+			// Add Label to show the packing item at index i
+			Label lblItem = new Label(ITEMS[i] + "  ");
+			lblItem.setFont(Font.font(SMALL_FONT));
 			
+			// Instantiate a Spinner to obtain input for number of each item user wants to pack
 			Spinner<Integer> spnItemQuantity = new Spinner<Integer>();
 			spnItemQuantity.setValueFactory(valueFactory);
-			itemQuantities[i] = spnItemQuantity.getValue();
-			spnItemQuantities.add(i, spnItemQuantity);
+			itemQuantities[i] = spnItemQuantity.getValue();	// add Spinner's value to the int array of number of items
+			spnItemQuantities.add(i, spnItemQuantity);	// add Spinner to array of Spinners
 			
+			// Add Listener for Spinner to deal with every time its value changes
 			spnItemQuantity.valueProperty().addListener(new ChangeListener<Integer>() {
 				public void changed(ObservableValue<? extends Integer> ov, Integer old_val, Integer new_val) {
 					itemQuantities[spnItemQuantities.indexOf(spnItemQuantity)] = spnItemQuantity.getValue();
 				}
 			});
 			
-			hbxRow.getChildren().addAll(lblActivity, spnItemQuantity);
+			hbxRow.getChildren().addAll(lblItem, spnItemQuantity);	// add Label & Spinner to parent node HBox
 			
-			if (i < FIRST_ROWS_ITEMS) {
+			// Depending on the index (of the packng item), add HBox containing item to either the first, second or third column VBox
+			if (i < FIRST_COLS_ITEMS) {
 				vbxCol1.getChildren().add(hbxRow);
-			} else if (i >= FIRST_ROWS_ITEMS && i < FIRST_ROWS_ITEMS * 2) {
+			} else if (i >= FIRST_COLS_ITEMS && i < FIRST_COLS_ITEMS * 2) {
 				vbxCol2.getChildren().add(hbxRow);
 			} else {
 				vbxCol3.getChildren().add(hbxRow);
 			}	
 		}
 		
-		// Suitcase output in the third VBox (3rd column)
-		StackPane stackSuitcase = new StackPane();
+		// Suitcase output in the 3rd VBox (3rd column)
+		StackPane stackSuitcase = new StackPane();	// to print suitcase's final weight (text) on top of a suitcase image
+		stackSuitcase.setAlignment(Pos.CENTER);
+		
+		// Add Image of suitcase with height 210
 		ImageView imgSuitcase = new ImageView(new Image(getClass().getResource("/images/suitcase.png").toString()));
 		imgSuitcase.setFitHeight(210);
 		imgSuitcase.setPreserveRatio(true);
+		
+		// Add Label to display final weight later
 		lblWeight = new Label();
 		lblWeight.setFont(Font.font(LARGE_FONT));
 		lblWeight.setPrefWidth(90);
 		lblWeight.setTextFill(Color.LIGHTCYAN);
 		lblWeight.setWrapText(true);
 		
+		// Add Image & Label to parent node StackPane
 		stackSuitcase.getChildren().addAll(imgSuitcase, lblWeight);
-		stackSuitcase.setAlignment(Pos.CENTER);
+		// Add StackPane to parent node VBox (3rd column)
 		vbxCol3.getChildren().add(stackSuitcase);
 		
+		// Add three VBoxes to parent node Hbox that contains the 3 columns of items
 		hbxItems.getChildren().addAll(vbxCol1, vbxCol2, vbxCol3);
-		hbxItems.setAlignment(Pos.CENTER);
+		// Add HBox to root node
 		root.getChildren().add(hbxItems);
 		
-		// Button to check weight
+		// Button for event handler to check weight (finish packing)
 		Button btnFinishPacking = new Button("Finish Packing");
 		btnFinishPacking.setFont(Font.font(SMALL_FONT));
 		btnFinishPacking.setOnAction(event -> checkWeight());
@@ -537,19 +563,21 @@ public class CruiseStoryGame extends Application {
 		// Adjust width of remaining money label
 		lblRemainingMoney.setPrefWidth(200);
 		
-		// Label to output result
+		// Label to output result, set the text to empty because don't need to show anything yet
 		lblResult = new Label("");
 		
-		// Label to output any possible error messages later
+		// Label to output any possible error messages later, set it to blank for now
 		lblErrorMessage.setText("");
 		
-		// Button to move to next scene
+		// Button for event handler to show next scene
 		btnStartCruise = new Button("Start Cruise Trip!");
 		btnStartCruise.setFont(Font.font(SMALL_FONT));
 		btnStartCruise.setOnAction(event -> showMiniGamesScreen());
 		
+		// Add Button ("Finish Packing"), 3 labels and Button ("Start Cruise Trip!") to root node
 		root.getChildren().addAll(btnFinishPacking, lblResult, lblRemainingMoney, lblErrorMessage, btnStartCruise);
 		
+		// Change the scene graph of the previous stage to this one
 		Window routeWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
@@ -561,6 +589,11 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
+	/**
+	 * Method to show results of passenger's suitcase's weight - event handler method for
+	 * the "Finish Packing" Button. Also, validates that user isn't clicking the button again
+	 * after already finishing packing.
+	 */
 	private void checkWeight() {
 		// If user already finished packing
 		if (eventDone) {
@@ -568,29 +601,43 @@ public class CruiseStoryGame extends Application {
 			return;
 		}
 		
+		// Remove error message that might've appeared (if user tried to move on to next screen before finishing packing)
 		lblErrorMessage.setText("");
 		
+		// Output result (if suitcase is under, over or on the weight limit) & the change in money
 		lblResult.setText(packingScenario.checkWeight(itemQuantities) + "\n" + packingScenario.showChangeInMoney());
+		
+		// Output the suitcase's final weight on the suitcase image
 		lblWeight.setText("Final weight: " + packingScenario.getWeight() + " lbs");
 		
+		// Get remaining money for the passenger's overall game
 		passenger.updateTotalMoney(packingScenario.getChangeInMoney());
 		lblRemainingMoney.setText(passenger.showMoneyLeft());
 		
+		// Set eventDone to true to prevent user packing another time
 		eventDone = true;
 	}
 	
+	/**
+	 * Method to show Mini Game selection screen - event handler method for btnStartCruise.
+	 * Also, validates that user has finished packing scenario before moving on to mini
+	 * games.
+	 */
 	private void showMiniGamesScreen() {
 		// Local constants
 		final int SCREEN_WIDTH = 400, GAMES_SCREEN_HEIGHT = 400;
 		
+		// If it is after the last day (2), show the end screen because have no mini games left to play
 		if (dayNumber == 3) {
 			showEndScreen();
 		} else {
+			// Validates that passenger actually finished the Packing Scenario before moving on to mini games
 			if (!eventDone) {
 				lblErrorMessage.setText("Please finish activity before moving on.");
 				return;
 			}
 			
+			// Get the passenger's mini games to play and store in local variable
 			ArrayList<String> miniGamesLeft = passenger.getMiniGamesLeft();
 			
 			// Root node for this JavaFX scene graph
@@ -598,36 +645,44 @@ public class CruiseStoryGame extends Application {
 			root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 			root.setAlignment(Pos.CENTER);
 			
-			// Label for title
+			// Label for title (shows which day it is)
 			lblTitle.setText("Day " + dayNumber);
+			
 			// Label for instructions
 			lblInstructions.setText("Select a mini game:");
 			lblInstructions.setFont(Font.font(LARGE_FONT));
-			
+		
+			// Add two Labels to root node
 			root.getChildren().addAll(lblTitle, lblInstructions);
 			
 			// Toggle group with RadioButtons for mini game(s) options left to play - user must select one
 			ToggleGroup tgMiniGames = new ToggleGroup();
 			
+			// Add each mini game as a RadioButton
 			for (String miniGame : miniGamesLeft) {
 				RadioButton radMiniGame = new RadioButton(miniGame);
 				radMiniGame.setFont(Font.font(LARGE_FONT));
-				radMiniGame.setToggleGroup(tgMiniGames);
-				root.getChildren().add(radMiniGame);
-				lblBonusMoney = new Label("");
-				lblBonusMoney.setFont(Font.font(MEDIUM_FONT));
-				
-				btnEndGame = new Button("End Game");
-				btnEndGame.setFont(Font.font(MEDIUM_FONT));
-				btnEndGame.setOnAction(event -> showActivitiesScreen());
+				radMiniGame.setToggleGroup(tgMiniGames);	// add to same ToggleGroup as other mini game
 				radMiniGame.setOnAction(event -> playMiniGame(event));
+				
+				root.getChildren().add(radMiniGame);	// add each RadioButton to root node
 			}
 			
-			Window routeWindow = mainScene.getWindow();
+			// Instantiate bonus money label to be used in either mini game (depends on which one gets clicked first, so must instantiate here)
+			lblBonusMoney = new Label("");
+			lblBonusMoney.setFont(Font.font(MEDIUM_FONT));
+			
+			// Instantiate "End Game" Button be used in either mini game
+			btnEndGame = new Button("End Game");
+			btnEndGame.setFont(Font.font(MEDIUM_FONT));
+			btnEndGame.setOnAction(event -> showActivitiesScreen());
+			
+			// Change the scene graph of the previous stage to this one
+			Window scenarioWindow = mainScene.getWindow();
 			mainScene = new Scene(root, SCREEN_WIDTH, GAMES_SCREEN_HEIGHT);
 			
-			if (routeWindow instanceof Stage) {
-				Stage myStage = (Stage) routeWindow;
+			if (scenarioWindow instanceof Stage) {
+				Stage myStage = (Stage) scenarioWindow;
 				myStage.setTitle("Day " + dayNumber + " - Mini Games");
 				myStage.setScene(mainScene);
 				myStage.show();
@@ -635,28 +690,38 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
+	/**
+	 * Method to call a mini game's method to play it - event handler method
+	 * for either RadioButton.
+	 */
 	private void playMiniGame(ActionEvent event) {
-		RadioButton temp = (RadioButton) event.getSource();
+		// Get the RadioButton that was selected
+		RadioButton temp = (RadioButton)event.getSource();
 		
-		if (temp.getText().equals(EscapeRoom.NAME)) {
-			royalEscapeRoom = new EscapeRoom();
-			passenger.removeMiniGame(temp.getText());
-			showEscapeRoomScreen();
-		} else if (temp.getText().equals(WordUnscramble.NAME)) {
-			wordUnscrambleGame = new WordUnscramble();
-			passenger.removeMiniGame(temp.getText());
-			showWordUnscrambleScreen();
+		// Launch the screen of the mini game that was clicked on
+		if (temp.getText().equals(EscapeRoom.NAME)) {	// if passenger picked Royal Escape Room
+			royalEscapeRoom = new EscapeRoom();		// instantiate EscapeRoom here
+			passenger.removeMiniGame(temp.getText());	// remove mini game from ArrayList stored in passenger object, so doesn't appear on screen next time
+			showEscapeRoomScreen();	// show Escape Room scene
+		} else if (temp.getText().equals(WordUnscramble.NAME)) {	// if passenger picked Word Unscramble
+			wordUnscrambleGame = new WordUnscramble();		// instantiate EscapeRoom here
+			passenger.removeMiniGame(temp.getText());	// remove mini game from ArrayList stored in passenger object, so doesn't appear on screen next time
+			showWordUnscrambleScreen();	// show Escape Room scene
 		}
 	}
 	
+	/**
+	 * Method to show the Royal Escape Room screen.
+	 */
 	private void showEscapeRoomScreen() {
-		
 		// Local constant
 		final int SCREEN_WIDTH = 1250; 
 		
-		// Local object and variables
+		// Set actual lock number to the constant at lockIndex (increments by one for every subsequent lock/clue)
+		// The constant holds the locks that will be revealed to the Passenger in the GAME's order (2, 1, 3, 5, 4)
 		actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
 		
+		// Root node for this JavaFX scene graph
 		VBox root = new VBox(GAP);
 		root.setAlignment(Pos.CENTER);
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
@@ -668,92 +733,120 @@ public class CruiseStoryGame extends Application {
 		lblInstructions.setText(EscapeRoom.showInstructions());
 		lblInstructions.setFont(Font.font(MEDIUM_FONT));
 	
+		// Add two Labels to root node
 		root.getChildren().addAll(lblTitle, lblInstructions);
 		
-		// Label for clue
+		// Add Label for clue
 		lblClue = new Label("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
 		lblClue.setFont(Font.font(MEDIUM_FONT));
 		lblClue.setWrapText(true);
+		root.getChildren().add(lblClue);
 		
-		// Show visual
+		// Add GridPane to show visual clue aid
 		gridVisual = new GridPane();
 		gridVisual.setHgap(GAP);	// sets gaps between columns
 		gridVisual.setVgap(GAP);	// sets gaps between rows
 		gridVisual.setAlignment(Pos.CENTER);
-		showGridVisual();
+		showGridVisual();	// this method will fill the GridPane with images if applicable
+		root.getChildren().add(gridVisual);
 		
-		root.getChildren().addAll(lblClue, gridVisual);
-		
-		// Hint section
-		// Button
+		// Hint section (HBox parent node)
 		HBox hbxHint = new HBox(GAP);
 		hbxHint.setAlignment(Pos.CENTER);
+		
+		// Add Button for event handler to show hint
 		btnHint = new Button("Get Hint");
 		btnHint.setFont(Font.font(SMALL_FONT));
 		btnHint.setOnAction(event -> showHint());
+		
+		// Add Label for error message just in case of invalid user input later, but set it to blank for now
 		lblErrorMessage.setText("");
+		
+		// Add Button and Label to parent node HBox, then add the HBox to root node
 		hbxHint.getChildren().addAll(btnHint, lblErrorMessage);
-		// Label
+		root.getChildren().add(hbxHint);
+		
+		// Add Label to output hint
 		lblHint = new Label("");
 		lblHint.setFont(Font.font(SMALL_FONT));
 		lblHint.setWrapText(true);
-		root.getChildren().addAll(hbxHint, lblHint);
+		root.getChildren().add(lblHint);
 		
-		// Section for user to pick which lock to openImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
+		// Section for user to pick which lock to open (parent node FlowPane)
+		FlowPane flowLockSelection = new FlowPane();
+		flowLockSelection.setAlignment(Pos.CENTER);
+		flowLockSelection.setHgap(GAP);
+		flowLockSelection.setPrefWidth(SCREEN_WIDTH);
+	
+		// Add ImageView to hold picture of Royal Escape Room's logo on Oasis of the Seas
 		ImageView imgEscapeRoom = new ImageView(new Image(getClass().getResource("/images/escapeRoom.png").toString()));
 		imgEscapeRoom.setFitHeight(120);
 		imgEscapeRoom.setPreserveRatio(true);
 		
-		FlowPane flowLockSelection = new FlowPane();
-		flowLockSelection.setAlignment(Pos.CENTER);
-		flowLockSelection.setRowValignment(VPos.TOP);
-		flowLockSelection.setHgap(GAP);
-		flowLockSelection.setPrefWidth(SCREEN_WIDTH);
-		// Label for instructions
+		// Label for lock selection instructions
 		Label lblLockSelection = new Label("Choose a lock to open:");
 		lblLockSelection.setFont(Font.font(MEDIUM_FONT));
+		
 		// ChoiceBox for lock choices
 		chcLocks = new ChoiceBox<String>();
-		setLockChoiceBox();
+		setLockChoiceBox();	// adds locks to the ChoiceBox
 		
 		// StackPane for Lock Image & Text output
 		StackPane stackLock = new StackPane();
 		stackLock.setAlignment(Pos.CENTER);
+		
+		// Add ImageView to hold lock's image to parent StackPane
 		imgLock = new ImageView();
 		imgLock.setFitHeight(120);
 		imgLock.setPreserveRatio(true);
 		imgLock.setPreserveRatio(true);
+		
+		// Add parent VBox that will hold two labels
 		VBox vbxLock = new VBox();
 		vbxLock.setAlignment(Pos.CENTER);
+		
+		// Add Label to show chosen lock's number
 		lblLockNum = new Label();
 		lblLockNum.setFont(Font.font(XL_FONT));
 		lblLockNum.setBackground(new Background(new BackgroundFill(Color.PINK, new CornerRadii(1), Insets.EMPTY)));
+		
+		// Add Label to show chosen lock's state (unlocked or locked)
 		lblLockState = new Label();
 		lblLockState.setFont(Font.font(SMALL_FONT));
 		lblLockState.setBackground(new Background(new BackgroundFill(Color.PINK, new CornerRadii(1), Insets.EMPTY)));
+		
+		// Changes the imgLock's Image depending on if the lock is unlocked or locked 
 		setLockImage();
+		
+		// Add two child Labels to parent VBox, then add child VBox to parent StackPane
 		vbxLock.getChildren().addAll(lblLockNum, lblLockState);
 		stackLock.getChildren().addAll(imgLock, vbxLock);
 		
+		// Add Image of lifeboat for visuals in escape room game
 		ImageView imgLifeBoat = new ImageView(new Image(getClass().getResource("/images/lifeBoat.png").toString()));
 		imgLifeBoat.setFitHeight(120);
 		imgLifeBoat.setPreserveRatio(true);
 		
+		// Add image (escape room), label, choicebox, stackpane and image (lifeboat) to parent FlowPane
 		flowLockSelection.getChildren().addAll(imgEscapeRoom, lblLockSelection, chcLocks, stackLock, imgLifeBoat);
+		// Add FlowPane to root node
 		root.getChildren().add(flowLockSelection);
 		
-		// Section for lock combo input
+		// Section for lock combo input (HBox parent node)
 		HBox hbxLockCombo = new HBox(GAP);
 		hbxLockCombo.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		hbxLockCombo.setAlignment(Pos.CENTER);
-		// Label
+		
+		// Add Label to prompt for lock combination to parent HBox
 		Label lblLockCombo = new Label("Enter lock combination for lock " + chosenLockNum + ":");
 		lblLockCombo.setFont(Font.font(MEDIUM_FONT));
 		hbxLockCombo.getChildren().add(lblLockCombo);
-		// Sliders
-		hbxSliders = new HBox(GAP);
+		
+		// Add sliders (changes depending on chosen lock number from ChoiceBox)
+		hbxSliders = new HBox(GAP); // Each slider will vertically appear in a column
 		setSliders();
 		
+		// Add Listener for ChoiceBox (which will change the lock's image, the number of sliders, chosen lock number variable and the combination prompt
 		chcLocks.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 			public void changed(ObservableValue<? extends String> ov, String old_lock, String new_lock) {
 				chosenLockNum = Integer.valueOf(String.valueOf(new_lock.charAt(LOCK_NUM_INDEX)));
@@ -763,82 +856,116 @@ public class CruiseStoryGame extends Application {
 			}
 		});
 		
-		hbxLockCombo.getChildren().add(hbxSliders);
-		
-		// Button for event handler
+		// Add Button for event handler to attempt to open lock
 		btnUnlock = new Button("Unlock");
 		btnUnlock.setFont(Font.font(SMALL_FONT));
 		btnUnlock.setOnAction(event -> openLock());
-		hbxLockCombo.getChildren().addAll(btnUnlock);
 		
-		root.getChildren().add(hbxLockCombo);
+		// Add all child Sliders & Button to parent HBox
+		hbxLockCombo.getChildren().addAll(hbxSliders, btnUnlock);
+		root.getChildren().add(hbxLockCombo);	// add HBox to root node
 		
-		// Section for bonus money & "Next Lock" button
+		// Bottom section (HBox parent node)
 		HBox hbxBottom = new HBox(50);
 		hbxBottom.setAlignment(Pos.CENTER);
 		
-		// Label for results
+		// Add Label for to show results later, set to blank for now
 		lblResult.setText("");
 		lblResult.setFont(Font.font(MEDIUM_FONT));
 		
-		// Button for event handler
+		// Button for event handler to move on to the next lock's clue
 		btnNextLock = new Button("Next Lock");
 		btnNextLock.setFont(Font.font(SMALL_FONT));
 		btnNextLock.setVisible(false);
 		btnNextLock.setOnAction(event -> showNextLock());
 		
-		// Label for bonus money output
+		// Add Label for bonus money output
 		lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
 		
+		// Add 2 Labels and Button to HBox parent
 		hbxBottom.getChildren().addAll(lblResult, btnNextLock, lblBonusMoney);
-		root.getChildren().add(hbxBottom);
+		root.getChildren().add(hbxBottom);	// add HBox to root node
 		
-		Window routeWindow = mainScene.getWindow();
+		// Change the scene graph of the previous stage to this one
+		Window miniGamesWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
-		if (routeWindow instanceof Stage) {
-			Stage myStage = (Stage) routeWindow;
+		if (miniGamesWindow instanceof Stage) {
+			Stage myStage = (Stage) miniGamesWindow;
 			myStage.setTitle("Royal Escape Room");
 			myStage.setScene(mainScene);
 			myStage.show();
 		}
 	}
 	
+	/**
+	 * Method to add Images to the GridPane gridVisual for Royal Escape Room.
+	 */
 	private void showGridVisual() {
+		// Set night number to 1 (for lock 5/clue 4)
 		int nightNum = 1;
 		gridVisual.getChildren().clear();
+		
+		// Get string visual
 		String [][] visual = royalEscapeRoom.getLockVisual(actualLockNum);
+		
+		// Add visuals in 2row x 5col GridPane
 		for (int row = 0; row < visual.length; row++) {
 			for (int col = 0; col < visual[row].length; col++) {
+				// Parent StackPane to hold image & label
 				StackPane stackGrid = new StackPane();
+				
+				// ImageView to hold the image clue in the grid
 				ImageView imgVisual = new ImageView(new Image(getClass().getResource("/images/" + visual[row][col] + ".png").toString()));
 				imgVisual.setFitHeight(95);
 				imgVisual.setPreserveRatio(true);
+				
+				// Label to show night numbers if the lock number is 5 (clue #4)
 				Label lblGrid = new Label("");
 				lblGrid.setFont(Font.font(SMALL_FONT));
-				StackPane.setAlignment(lblGrid, Pos.BOTTOM_CENTER);
+				StackPane.setAlignment(lblGrid, Pos.BOTTOM_CENTER);	// stack the label at the bottom of image
+				
+				// Add night number on Label if lock 5 (clue #4)
 				if (actualLockNum == 5) {
 					lblGrid.setText("Night " + (nightNum));
-					nightNum++;
+					nightNum++;	// Increment night # by 1 to show each subsequent night #
 				}
+				
+				// Add children (ImageView & Label) to parent StackPane
 				stackGrid.getChildren().addAll(imgVisual, lblGrid);
+				// Add StackPane to root node at the 2d array's indices (but (col,row) instead of (row,col))
 				gridVisual.add(stackGrid, col, row);
 			}
 		}
 	}
 	
+	/**
+	 * Method to add lock options to the chcLocks ChoiceBox.
+	 */
 	private void setLockChoiceBox() {
-		/*chcLocks.setDisable(true);*/
+		// Get locks (their String representations) left to choose from
 		String [] strLocks = royalEscapeRoom.getStrLocks();
+		
+		// Clears ChoiceBox and sets it to the new array of locks left
 		chcLocks.getItems().setAll(strLocks);
+		
+		// Set ChoiceBox's default value to first lock left (and chosenLockNum to that lock's number)
 		chcLocks.setValue(strLocks[0]);
 		chosenLockNum = Integer.valueOf(String.valueOf(strLocks[0].charAt(LOCK_NUM_INDEX)));
-		chcLocks.setDisable(false);
+		chcLocks.setDisable(false);	// enable ChoiceBox again to allow passenger to choose an option
 	}
 	
+	/**
+	 * Method to set the image of the lock (opened or closed).
+	 */
 	private void setLockImage() {
+		// Set the lock's number to the chosen lock's number
 		lblLockNum.setText(String.valueOf(chosenLockNum));
+		
+		// Set the lock's state to the chosen lock's state ("UNLOCKED" or "LOCKED")
 		lblLockState.setText(royalEscapeRoom.getStrLockState(chosenLockNum));
+		
+		// Set image of lock depending on the chosen lock's state
 		if (royalEscapeRoom.getLockState(chosenLockNum)) {
 			imgLock.setImage(OPEN_LOCK);
 		} else {
@@ -846,292 +973,424 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
+	/**
+	 * Adds sliders to HBox of sliders, depending on the chosen lock (since number
+	 * of sliders in HBox varies depending on lock).
+	 */
 	private void setSliders() {
-		hbxSliders.getChildren().clear();
-		
+		// Instantiate ArrayLists of UI controls for each digit for the chosen lock's combination
 		ArrayList<Slider> sldComboNums = new ArrayList<Slider>();
 		ArrayList<Label> lblComboNums = new ArrayList<Label>();
+		
+		// Stores the number of digits in the chosen lock's combination
 		lockComboNums = new int[royalEscapeRoom.getLockCombo(chosenLockNum).length()];
 		
+		// Remove all children from HBox of sliders to add the new ones without adding to what already exists
+		hbxSliders.getChildren().clear();
+		
+		// For each digit in the chosen lock's combination, add a VBox to the HBox hbxSliders
 		for (int i = 0; i < lockComboNums.length; i++) {
 			// New VBox to hold slider & label
 			VBox vbxComboNum = new VBox();
-			// Slider for each slot in the combo
+			
+			// Slider for each digit in the combo (ranges from 0-9, default value is 0)
 			Slider sldComboNum = new Slider(0, 9, 0);
-			sldComboNum.setOrientation(Orientation.VERTICAL);
+			sldComboNum.setOrientation(Orientation.VERTICAL);	// vertical slider instead of default horizontal
 			sldComboNum.setShowTickMarks(true);		// set tick marks visible
 			sldComboNum.setShowTickLabels(true);	// set the label the value of each tick mark visible
 			sldComboNum.setMajorTickUnit(1);		// set the scale between each major tick mark
 			sldComboNum.setBlockIncrement(1);		// number by which slider moves if using arrow key is clicked
 			sldComboNum.setPrefHeight(120);
-			int sliderValue = (int)sldComboNum.getValue();	// get value of slider
+			
+			// Get value of slider, set it to the lock combination's digit at index i
+			int sliderValue = (int)sldComboNum.getValue();
+			lockComboNums[i] = sliderValue;
+			
 			// Label to output value of each slider
 			Label lblComboNum = new Label(String.valueOf(sliderValue));
 			lblComboNum.setFont(Font.font(SMALL_FONT));
-			
-			lockComboNums[i] = sliderValue;
+	
+			// Add Slider & Label to their corresponding ArrayLists at index i
 			sldComboNums.add(i, sldComboNum);
 			lblComboNums.add(i, lblComboNum);
+			
+			// Add Slider & Label to parent VBox
 			vbxComboNum.getChildren().addAll(sldComboNum, lblComboNum);
 			
+			// Add Listener to each Slider to change its value every time the user moves the knob
 			sldComboNum.valueProperty().addListener(new ChangeListener<Number>() {
 				public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
-					int newValue = (int)sldComboNum.getValue();
-					int sliderIndex = sldComboNums.indexOf(sldComboNum);
+					int newValue = (int)sldComboNum.getValue();		// store new value of Slider
+					int sliderIndex = sldComboNums.indexOf(sldComboNum);	// get the index of the slider that was changed out of all sliders
 					
+					// Set the lock combination's digit at index i to the new value
 					lockComboNums[sliderIndex] = newValue;
+					
+					// Output the new value of the slider in Label
 					lblComboNums.get(sliderIndex).setText(String.valueOf(newValue));
 				}
 			});
 			
+			// Add VBox of slider with its value stored in a Label to parent HBox that holds all Sliders
 			hbxSliders.getChildren().add(vbxComboNum);
 		}
 	}
 	
+	/**
+	 * Outputs a hint for the actual lock and updated bonus money, only if eligible
+	 * (if passenger hasn't received a hint yet for that lock). If not eligible, outputs
+	 * an error message and doesn't subtract hint fee from bonus money.
+	 */
 	private void showHint() {
+		// Only give hint if passenger hasn't received hint for the actual lock yet
 		if (royalEscapeRoom.canHaveHint(actualLockNum)) {
-			lblHint.setText(royalEscapeRoom.getLockHint(actualLockNum));
-		} else {
-			lblErrorMessage.setText(royalEscapeRoom.getLockHint(actualLockNum));
+			lblHint.setText(royalEscapeRoom.getLockHint(actualLockNum));	// output hint in RESULT label
+			lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());		// show updated bonus money
+		} else {	// if passenger already received hint for that lock
+			lblErrorMessage.setText(royalEscapeRoom.getLockHint(actualLockNum));	// output error message in ERROR MESSAGE label
 		}
-		lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
 	}
 	
+	/**
+	 * Attempts to open lock with passenger's code. Makes sure they don't try to
+	 * open a lock that is already open.
+	 */
 	private void openLock() {
-		String code = "";
+		String code = "";	// set code to blank for now in order to add to it
 		
+		// Input validation: Make sure passenger doesn't try to unlock the same lock again
 		if (royalEscapeRoom.getLockState(chosenLockNum) ) {
-			lblResult.setText("You already unlocked lock " + chosenLockNum);
+			lblResult.setText("You already unlocked lock " + chosenLockNum);	// error message
 			return;
 		}
 		
-		if (chosenLockNum != 6) {
+		// For the last/6th special lock, its input comes from a TextField not from int array from Sliders
+		if (chosenLockNum != 6) {	// if lock is not lock 6
+			
+			// Convert combination in int array to a String
 			for (int comboNum : lockComboNums) {
 				code += String.valueOf(comboNum);
 			}
+			
 		} else {
-			code = txtLockCombo.getText().trim();
+			code = txtLockCombo.getText().trim();	// set the code to the String value of input from TextField
 		}
 		
+		// Output result
 		lblResult.setText(royalEscapeRoom.attemptUnlock(chosenLockNum, actualLockNum, code));
 		
-		if (royalEscapeRoom.getLockState(chosenLockNum)) {
-			btnHint.setDisable(true);
-			if (chosenLockNum != 6) {
-				btnNextLock.setVisible(true);
-				setLockImage();
-				chcLocks.setDisable(true);
-			} else {
-				imgLock.setImage(OPEN_LOCK);
-				btnEndGame.setVisible(true);
-				lblBonusMoney.setText("Your final bonus money is $" + royalEscapeRoom.getBonusMoney());
+		// Process/adjust output controls depending on chosen lock's state (unlocked/locked)
+		if (royalEscapeRoom.getLockState(chosenLockNum) || chosenLockNum == 6) {	// if unlocked
+			btnHint.setDisable(true);	// disable hint Button to prevent invalid input
+			
+			// Output/processing is different for last/6th special lock
+			if (chosenLockNum != 6) {	// if not 6th lock
+				btnNextLock.setVisible(true);	// allows user to move on to next lock
+				setLockImage();		// changes image of lock depending on its state
+				chcLocks.setDisable(true);	// disable ChoiceBox to prevent user from choosing another lock when already opened this one
+			} else {	// if 6th lock
+				imgLock.setImage(OPEN_LOCK);	// change image of lock to open lock
+				btnEndGame.setVisible(true);	// allow user to finish Royal Escape Room mini game
+				lblBonusMoney.setText("Your final bonus money is $" + royalEscapeRoom.getBonusMoney());	// output final bonus money
+				
+				// Update remaining money & output to passenger
 				passenger.updateTotalMoney(royalEscapeRoom.getBonusMoney());
 				lblRemainingMoney.setText(passenger.showMoneyLeft());
 			}
-		}
-		
-		if (chosenLockNum != 6 || !royalEscapeRoom.getLockState(chosenLockNum)) {
-			lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());
+		} else {
+			lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());	// show bonus money after fee
 		}
 	}
 	
+	/**
+	 * Shows the next lock's clue.
+	 */
 	private void showNextLock() {
+		// Adjust UI elements from previous opened lock
+		lblErrorMessage.setText("");	// set error message to blank
+		lblHint.setText("");			// set hint output to blank
+		lblResult.setText("");			// set result output to blank
+		
+		// If the actual lock is lock 4 (last clue #5), then don't show next lock. Instead, show last lock.
 		if (actualLockNum != 4) {
-			lockIndex++;
+			lockIndex++;	// increment lock index
+			actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];	// Set the actual lock number to the lock in the GAME's order of locks
 			
-			actualLockNum = EscapeRoom.LOCK_NUMS[lockIndex];
-			
+			// Show the next lock's clue
 			lblClue.setText("Clue #" + (lockIndex + 1) + ": " + royalEscapeRoom.getLockClue(actualLockNum));
 		
+			// Show the next lock's visual aid (only if it needs one)
 			if (royalEscapeRoom.needsVisual(actualLockNum)) {
 				gridVisual.setVisible(true);
 				showGridVisual();
 			} else {
-				gridVisual.setVisible(false);
+				gridVisual.setVisible(false);	// don't show visual aid
 			}
 			
-			btnHint.setDisable(false);
-			lblErrorMessage.setText("");
-			lblHint.setText("");
-			lblResult.setText("");
-			btnNextLock.setVisible(false);
+			// Adjust Buttons from previous opened lock
+			btnHint.setDisable(false);		// enable hint button again
+			btnNextLock.setVisible(false);	// don't show next lock button yet
 
+			// Show the updated lock choices (after removing the previous lock from the list)
 			setLockChoiceBox();
-		} else {
-			actualLockNum = 6;
-			showLastLock();
+		} else {	// if last lock (#4, but clue 5) before lock 6
+			actualLockNum = 6;	// set lock number in GAME to last lock's
+			showLastLock();		// show last lock's scene
 		}
 	}
 	
+	/**
+	 * Shows the last lock in the Royal Escape Room's screen.
+	 */
 	private void showLastLock() {
+		// Local constant
 		final int SCREEN_WIDTH = 700;
 		
+		// Root node for this JavaFX scene graph
 		VBox root = new VBox(GAP);
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		root.setAlignment(Pos.CENTER);
 		
+		// Set the chosen lock number to 6 too
 		chosenLockNum = 6;
 		
+		// Add Label for title
 		lblTitle.setText("Final lock! This is the lock on the lifeboat.");
 		root.getChildren().add(lblTitle);
 		
-		// Section for word input
+		// Section for word input (BorderPane parent node)
 		BorderPane borderWordInput = new BorderPane();
-		// Top of BorderPane
+		
+		// TOP of BorderPane
+		// HBox as parent node
 		HBox hbxTop = new HBox(GAP);
 		hbxTop.setAlignment(Pos.CENTER);
+		
+		// Add Label to prompt user for a word
 		Label lblWordPrompt = new Label("Enter a word:");
 		lblWordPrompt.setFont(Font.font(MEDIUM_FONT));
+		
+		// Add TextField for user's word input
 		txtWord = new TextField();
-		Button btnEnterWord = new Button("Enter");
+		
+		// Add Button for event handler to output consonant pyramid & validate user input (word in TextField)
+		btnEnterWord = new Button("Enter");
 		btnEnterWord.setFont(Font.font(MEDIUM_FONT));
 		btnEnterWord.setOnAction(event -> enterWord());
+		
+		// Add children nodes (Label, TextField and Button) to parent HBox
 		hbxTop.getChildren().addAll(lblWordPrompt, txtWord, btnEnterWord);
 		BorderPane.setAlignment(hbxTop, Pos.TOP_CENTER);
 		borderWordInput.setTop(hbxTop);
-		// Right side of BorderPane
+		
+		// RIGHT side of BorderPane
+		// Add Label for consonant word pyramid output
 		lblWordPyramid = new Label("");
 		lblWordPyramid.setAlignment(Pos.CENTER_LEFT);
 		lblWordPyramid.setFont(Font.font(MEDIUM_FONT));
 		borderWordInput.setRight(lblWordPyramid);
-		// Center of BorderPane
+		
+		// CENTER of BorderPane
+		// StackPane as parent node (to hold lock's image on top of lifeboat's image)
 		StackPane stackCenter = new StackPane();
 		stackCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		
+		// ImageView for image of lifeboat
 		ImageView imgLifeBoat = new ImageView(new Image(getClass().getResource("/images/lifeBoat2.png").toString()));
 		imgLifeBoat.setFitHeight(150);
 		imgLifeBoat.setPreserveRatio(true);
+		
+		// ImageView to show lifeboat's lock's state
 		imgLock.setImage(CLOSED_LOCK);
 		imgLock.setFitHeight(90);
+		
+		// Add two ImageViews to StackPane
 		stackCenter.getChildren().addAll(imgLifeBoat, imgLock);
 		borderWordInput.setCenter(stackCenter);
 		BorderPane.setAlignment(stackCenter, Pos.CENTER);
-		// Bottom of BorderPane
+		
+		// BOTTOM of BorderPane
+		// VBox as parent node
 		VBox vbxBottom = new VBox(GAP);
 		vbxBottom.setAlignment(Pos.CENTER);
+		
+		// Label for last lock's clue
 		lblClue.setText("Clue: " + royalEscapeRoom.getLockClue(chosenLockNum));
+		
+		// Button for event handler to show hint
 		Button btnHint = new Button("Get Hint");
 		btnHint.setFont(Font.font(SMALL_FONT));
 		btnHint.setOnAction(event -> showHint());
-		lblHint.setText("");
-		lblErrorMessage.setText("");
+		
+		// Add children nodes (3 Labels and Button) to VBox parent
 		vbxBottom.getChildren().addAll(lblClue, btnHint, lblHint, lblErrorMessage);
 		borderWordInput.setBottom(vbxBottom);
 		root.getChildren().add(borderWordInput);
 		
-		// Section for lock combo
+		// Section for lock combo (HBox parent node)
 		HBox hbxLockCombo = new HBox(GAP);
 		hbxLockCombo.setAlignment(Pos.CENTER);
+		
 		// Label for lock combo prompt
 		Label lblComboPrompt = new Label("Enter lock combination:");
 		lblComboPrompt.setFont(Font.font(MEDIUM_FONT));
+		
 		// TextField for lock combo input
 		txtLockCombo = new TextField();
-		txtLockCombo.setDisable(true);
-		hbxLockCombo.getChildren().addAll(lblComboPrompt, txtLockCombo);
-		root.getChildren().add(hbxLockCombo);
+		txtLockCombo.setDisable(true);	// disable lock combo input TextField for now because need word input first
 		
-		// Section for unlocking/output
+		// Add children (Label & TextField for lock combo) to HBox parent node
+		hbxLockCombo.getChildren().addAll(lblComboPrompt, txtLockCombo);
+		root.getChildren().add(hbxLockCombo);	// add HBox to root node
+		
+		// Section for unlocking/output (Hbox parent node)
 		HBox hbxUnlocking = new HBox(GAP);
 		hbxUnlocking.setAlignment(Pos.CENTER);
-		// Button for event handler
+		
+		// Button for event handler to try to open lock (don't show yet because need word input for pyramid first)
 		btnUnlock.setVisible(false);
+		
 		// Label for result output
 		lblResult.setText("");
+		
+		// Add children (Button & 2 Labels) to HBox parent node
 		hbxUnlocking.getChildren().addAll(btnUnlock, lblResult, lblBonusMoney);
-		root.getChildren().add(hbxUnlocking);
+		root.getChildren().add(hbxUnlocking);	// add HBox to root node
 		
-		// Button to end game
-		btnEndGame.setVisible(false);
-		root.getChildren().addAll(lblRemainingMoney, btnEndGame);
+		// Button for event handler to end game
+		btnEndGame.setVisible(false);	// don't show yet because haven't received word or lock combination input yet
+		root.getChildren().addAll(lblRemainingMoney, btnEndGame);	// also add remaining money label to root
 		
-		Window routeWindow = mainScene.getWindow();
+		// Change the scene graph of the previous stage to this one
+		Window previousLocksWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
-		if (routeWindow instanceof Stage) {
-			Stage myStage = (Stage) routeWindow;
+		if (previousLocksWindow instanceof Stage) {
+			Stage myStage = (Stage) previousLocksWindow;
 			myStage.setTitle("Royal Escape Room: Final Lock");
 			myStage.setScene(mainScene);
 			myStage.show();
 		}
 	}
 	
+	/**
+	 * Shows word pyramid if word entered by user is valid, otherwise, shows error
+	 * message and doesn't output pyramid - event handler method for "Enter" Button.
+	 */
 	private void enterWord() {
 		String word = txtWord.getText().trim();
 		
 		// Input validation
-		if (word.isEmpty()) {
+		if (word.isEmpty()) {	// validate that word isn't blank
 			lblErrorMessage.setText("Invalid input (cannot be blank).");
 			return;
-		} else if (!royalEscapeRoom.validateWord(word)) {
+		} else if (!royalEscapeRoom.validateWord(word)) {	// validate that word only contains letters
 			lblErrorMessage.setText("Invalid input (must be a word).");
 			return;
 		}
 		
+		// Set error message Label to blank just in case previously received error message
 		lblErrorMessage.setText("");
+		
+		// Output consonant pyramid
 		lblWordPyramid.setText(royalEscapeRoom.getConsonantPyramid(word));
+		
+		// Disable word TextField & "Enter" Button to make sure user doesn't change their word & consonant pyramid
+		txtWord.setDisable(true);
+		btnEnterWord.setDisable(true);
+		
+		// Allow user to enter their combination attempt now that they entered their word
 		txtLockCombo.setDisable(false);
 		btnUnlock.setVisible(true);
-		txtWord.setDisable(true);
 	}
 	
+	/**
+	 * Method to show the Word Unscramble Game screen.
+	 */
 	private void showWordUnscrambleScreen() {
+		// Local constants
 		final int SCREEN_WIDTH = 750, THIS_SCREEN_HEIGHT = 800;
-		
 		final Image imgBLANK = new Image(CruiseStoryGame.class.getResource("/images/white.png").toString());
 		
+		// Root node for this JavaFX scene graph
 		BorderPane root = new BorderPane();
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
-		// Top section
+		// TOP section of BorderPane (VBox parent node)
 		VBox vbxTop = new VBox(GAP);
 		vbxTop.setAlignment(Pos.CENTER);
+		
+		// Label for title
 		lblTitle.setText(WordUnscramble.NAME);
+		
+		// Label for instructions
 		lblInstructions.setText(WordUnscramble.showInstructions());
+		
+		// Label for letters to use to create words
 		Label lblLetters = new Label("Letters: " + WordUnscramble.WORD);
 		lblLetters.setFont(Font.font(MEDIUM_FONT));
 		lblLetters.setTextFill(Color.MEDIUMORCHID);
+		
+		// Add children (3 Labels) to parent VBox
 		vbxTop.getChildren().addAll(lblTitle, lblInstructions, lblLetters);
 		BorderPane.setAlignment(vbxTop, Pos.TOP_CENTER);
 		root.setTop(vbxTop);
 		
-		// Left section
+		// LEFT section of BorderPane (VBox parent node)
 		VBox vbxLeft = new VBox(GAP);
+		
+		// Label to show the bonus points system for this game
 		Label lblBonusPtsSystem = new Label(WordUnscramble.showPointsSystem());
 		lblBonusPtsSystem.setFont(Font.font(MEDIUM_FONT));
+		
+		// Label to show the number of possible words
 		Label lblNumOfPossibleWords = new Label("Number of possible words: " + NUM_OF_POSSIBLE_WORDS);
 		lblNumOfPossibleWords.setFont(Font.font(MEDIUM_FONT));
+		
+		// Reset bonus money label to blank (only updates when user finishes entering words)
 		lblBonusMoney.setText("");
+		
+		// Add children (4 Labels) to VBox parent
 		vbxLeft.getChildren().addAll(lblBonusPtsSystem, lblNumOfPossibleWords, lblBonusMoney, lblRemainingMoney);
 		BorderPane.setAlignment(vbxLeft, Pos.CENTER);
 		root.setLeft(vbxLeft);
 		
-		// Right section
+		// RIGHT section of BorderPane
 		VBox vbxRight = new VBox(GAP);
+		
+		// Add Label to output all possible words after user finishes entering their words
 		lblPossibleWords = new Label("");
 		lblPossibleWords.setFont(Font.font(MEDIUM_FONT));
 		
+		// Add Button for event handler to check words entered by user
 		btnDone = new Button("Done");
 		btnDone.setFont(Font.font(SMALL_FONT));
 		btnDone.setOnAction(event -> checkWords());
+		
+		// Add children (Label & Button) to VBox root
 		vbxRight.getChildren().addAll(lblPossibleWords, btnDone);
 		BorderPane.setAlignment(vbxRight, Pos.CENTER_LEFT);
 		root.setRight(vbxRight);
 		
-		// Center section
+		// CENTER section of BorderPane (GridPane parent node)
 		GridPane gridCenter = new GridPane();
 		gridCenter.setHgap(GAP);	// sets gaps between columns
 		gridCenter.setVgap(GAP);	// sets gaps between rows
 		gridCenter.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
+		// Add an array of TextFields and ImageViews as UI controls for each word entered by user
 		txtWords = new TextField[NUM_OF_POSSIBLE_WORDS];
 		imgOutputs = new ImageView[NUM_OF_POSSIBLE_WORDS];
 		
+		// For each word entered by user, add a TextField and a blank image (that will later hold result)
 		for (int j = 0; j < NUM_OF_POSSIBLE_WORDS; j++) {
 			txtWords[j] = new TextField();
+			
 			imgOutputs[j] = new ImageView(imgBLANK);
 			imgOutputs[j].setFitHeight(35);
 			imgOutputs[j].setPreserveRatio(true);
 			
+			// Split TextField/ImageView sets into two columns
 			if (j < NUM_OF_POSSIBLE_WORDS / 2) {	// TextFields/ImageViews 1-11
 				gridCenter.add(txtWords[j], 0, j);
 				gridCenter.add(imgOutputs[j], 1, j);
@@ -1140,38 +1399,48 @@ public class CruiseStoryGame extends Application {
 				gridCenter.add(imgOutputs[j], 3, j - (NUM_OF_POSSIBLE_WORDS / 2));
 			}
 		}
-		
+
 		BorderPane.setAlignment(gridCenter, Pos.CENTER);
 		root.setCenter(gridCenter);
 		
-		// Bottom section
+		// BOTTOM section of BorderPane (Button for event handler to end the game)
 		btnEndGame.setDisable(true);
 		root.setBottom(btnEndGame);
 		BorderPane.setAlignment(btnEndGame, Pos.CENTER);
 		
-		Window routeWindow = mainScene.getWindow();
+		// Change the scene graph of the previous stage to this one
+		Window miniGamesWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, THIS_SCREEN_HEIGHT);
 		
-		if (routeWindow instanceof Stage) {
-			Stage myStage = (Stage) routeWindow;
+		if (miniGamesWindow instanceof Stage) {
+			Stage myStage = (Stage) miniGamesWindow;
 			myStage.setTitle("Word Unscramble");
 			myStage.setScene(mainScene);
 			myStage.show();
 		}
 	}
 	
+	/**
+	 * Method to check the 22 TextFields that contains user's words for the Word
+	 * Unscramble mini game - event handler for the "Done" Button.
+	 */
 	private void checkWords() {
-		String[] wordsToCheck = new String[NUM_OF_POSSIBLE_WORDS];
+		// Local constants for Images
 		final Image BLANK = new Image(getClass().getResource("/images/blankAnswer.png").toString());
 		final Image INCORRECT = new Image(getClass().getResource("/images/incorrect.png").toString());
 		final Image CORRECT = new Image(getClass().getResource("/images/correct.png").toString());
 		
+		String[] wordsToCheck = new String[NUM_OF_POSSIBLE_WORDS];
+		
+		// Populate wordsToCheck array with corresponding input from TextFields
 		for (int i = 0; i < NUM_OF_POSSIBLE_WORDS; i++) {
 			wordsToCheck[i] = txtWords[i].getText().trim();
 		}
 		
+		// Get array of corresponding results for each word
 		String[] results = wordUnscrambleGame.checkWords(wordsToCheck);
 		
+		// Add resulting image for each entry by user
 		for (int j = 0; j < results.length; j++) {
 			if (results[j].equals(WordUnscramble.BLANK)) {
 				imgOutputs[j].setImage(BLANK);
@@ -1182,8 +1451,10 @@ public class CruiseStoryGame extends Application {
 			}
 		}
 		
+		// Output all possible words that could've been created from the given word
 		String strPossibleWords = "Possible Words:\n";
 		String[] possibleWords = WordUnscramble.POSSIBLE_WORDS;
+		
 		for (int i = 0; i < possibleWords.length; i++) {
 			strPossibleWords += possibleWords[i];
 			if (i % 2 == 0) {	// even
@@ -1192,50 +1463,69 @@ public class CruiseStoryGame extends Application {
 				strPossibleWords += "\n";
 			}
 		}
+		
 		lblPossibleWords.setText(strPossibleWords);
 		
+		// Make sure user doesn't re-enter words (so disable "Done" Button)
 		btnDone.setDisable(true);
+		
+		// Enable "End Game" now that user finished entering words
 		btnEndGame.setDisable(false);
+		
+		// Output bonus money resulting from this game
 		lblBonusMoney.setText(wordUnscrambleGame.showBonusAmount());
 		
+		// Output remaining money for the overall game
 		passenger.updateTotalMoney(wordUnscrambleGame.getBonusMoney());
 		lblRemainingMoney.setText(passenger.showMoneyLeft());
-		
 	}
 	
+	/**
+	 * Method to show the Activities Scenario screen - event handler for
+	 * the "End Game" Button.
+	 */
 	private void showActivitiesScreen() {
+		// Local constants
 		final int SCREEN_WIDTH = 1250;
 		final int NUM_OF_ACTIVITIES = ActivitiesScenario.ACTIVITIES.length;
-		final int HALF = NUM_OF_ACTIVITIES / 2;
+		final int HALF = NUM_OF_ACTIVITIES / 2;	// helps to separate the controls for each activity into 2 columns
 		
-		ImageView[] imgActivities = new ImageView[NUM_OF_ACTIVITIES];
+		// Local variables
 		Label lblActivity;
 		int rowIndex;
+		ImageView[] imgActivities = new ImageView[NUM_OF_ACTIVITIES];
 		
+		// Root node for this JavaFX scene graph (VBox)
 		VBox root = new VBox(GAP);
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		root.setAlignment(Pos.CENTER);
 		
-		// Title
+		// Labels for title & instructions, add to root node
 		lblTitle.setText("Day " + dayNumber + ": Activities");
 		lblInstructions.setText(ActivitiesScenario.showInstructions());
 		root.getChildren().addAll(lblTitle, lblInstructions);
 		
-		// GridPane section for user input
+		// Section for user input (GridPane parent node)
 		GridPane gridInput = new GridPane();
 		gridInput.setHgap(GAP);	// sets gaps between columns
 		gridInput.setVgap(GAP);	// sets gaps between rows
 		gridInput.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		gridInput.setAlignment(Pos.CENTER);
 		
+		// Array TextFields for input for number of times to perform each activity
 		txtNumsPerActivities = new TextField[NUM_OF_ACTIVITIES];
 		
+		// For each activity, add an image of it, a label to show which activity and TextField for input of number of times to perform it
 		for (int i = 0; i < NUM_OF_ACTIVITIES; i++) {
+			// Access image using index i in its file name
 			imgActivities[i] = new ImageView(new Image(getClass().getResource("/images/activity" + i + ".png").toString()));
 			imgActivities[i].setFitHeight(70);
 			imgActivities[i].setPreserveRatio(true);
+			
+			// Use index i as cost of each activity ($0-$13)
 			lblActivity = new Label(ActivitiesScenario.ACTIVITIES[i] + " ($" + i + "):");
 			lblActivity.setFont(Font.font(MEDIUM_FONT));
+			
 			txtNumsPerActivities[i] = new TextField();
 			
 			if (i < HALF) {	// TextFields/ImageViews 1-7
@@ -1250,133 +1540,197 @@ public class CruiseStoryGame extends Application {
 				gridInput.add(txtNumsPerActivities[i], 10, rowIndex);
 			}
 		}
+		
 		root.getChildren().add(gridInput);
 		
-		HBox hbxResult = new HBox(GAP);
-		hbxResult.setAlignment(Pos.CENTER);
+		// Section for results (HBox parent node)
+		HBox hbxResults = new HBox(GAP);
+		hbxResults.setAlignment(Pos.CENTER);
+		
+		// Button for event handler to calculate the cost of all activities 
 		btnDoneActivities = new Button("Done");
 		btnDoneActivities.setFont(Font.font(SMALL_FONT));
 		btnDoneActivities.setOnAction(event -> calculateActivitiesCost());
+		
+		// Label to show cost of activities, set to blank for now
 		lblResult.setText("");
 		lblResult.setFont(Font.font(MEDIUM_FONT));
-		hbxResult.getChildren().addAll(btnDoneActivities, lblResult);
 		
+		// Add children (Button & Label) to HBox parent node
+		hbxResults.getChildren().addAll(btnDoneActivities, lblResult);
+		root.getChildren().add(hbxResults);
+		
+		// Add Label in case of error, set to blank for now
 		lblErrorMessage.setText("");
+		root.getChildren().add(lblErrorMessage);
 		
+		// HBox parent node to hold Button & Label (remaining money)
 		HBox hbxBottom = new HBox(GAP);
 		hbxBottom.setAlignment(Pos.CENTER);
+		
+		// Button for event handler to end Activities Scenario & show Mini Games Screen or End Screen (if last day)
 		btnStartCruise.setText("Next");
 		btnStartCruise.setDisable(true);
-		hbxBottom.getChildren().addAll(btnStartCruise, lblRemainingMoney);
-		root.getChildren().addAll(hbxResult, lblErrorMessage, hbxBottom);
 		
-		Window routeWindow = mainScene.getWindow();
+		// Add children (Button & Label) to HBox parent
+		hbxBottom.getChildren().addAll(btnStartCruise, lblRemainingMoney);
+		root.getChildren().addAll(hbxBottom);	// add HBox to root node
+		
+		// Change the scene graph of the previous stage to this one
+		Window miniGameWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
-		if (routeWindow instanceof Stage) {
-			Stage myStage = (Stage) routeWindow;
-			myStage.setTitle("End Screen");
+		if (miniGameWindow instanceof Stage) {
+			Stage myStage = (Stage) miniGameWindow;
+			myStage.setTitle("Activities Scenario");
 			myStage.setScene(mainScene);
 			myStage.show();
-			dayNumber++;
+			dayNumber++;	// increment day number by one since the Activities Scenario is the last event of each day
 		}
 	}
 	
+	/**
+	 * Method to show the calculate the cost of all activities - event handler for
+	 * the "Done" Button in the Activities Scenario screen.
+	 */
 	private void calculateActivitiesCost() {
 		int[] numOfEachActivity = new int[ActivitiesScenario.ACTIVITIES.length];
 		
+		// Loop through each number per activity entered by user
 		for (int i = 0; i < numOfEachActivity.length; i++) {
-			String textInput = txtNumsPerActivities[i].getText().trim();
+			String textInput = txtNumsPerActivities[i].getText().trim();	// convert TextField's input to String
 			
+			// Input validation: Make sure input is not empty
 			if (textInput.isEmpty()) {
 				lblErrorMessage.setText("Invalid entry (empty box).");
 				return;
 			}
 			
+			// Input validation: Make sure TextField only contained numbers
 			try {
 				numOfEachActivity[i] = Integer.parseInt(textInput);
 			} catch (NumberFormatException e) {
-				lblErrorMessage.setText("Invalid entry (Please enter a number)");
+				lblErrorMessage.setText("Invalid entry (Please enter a number)");	// error message
 				return;
 			}
 		}
 		
+		// Instantiate ActivitiesScenario with the number of each activity input
 		ActivitiesScenario activitiesScenario = new ActivitiesScenario(numOfEachActivity);
 		
+		// Calculate the total cost of the activities
 		activitiesScenario.calculateCost();
 		
+		// Set error message Label to blank in case an error message was shown before for invalid input
 		lblErrorMessage.setText("");
+		
+		// Show the cost of all activities
 		lblResult.setText(activitiesScenario.showChangeInMoney());
 		
+		// Update the passenger's overall remaining money in the Cruise Story Game
 		passenger.updateTotalMoney(activitiesScenario.getChangeInMoney());
 		lblRemainingMoney.setText(passenger.showMoneyLeft());
 		
-		btnStartCruise.setDisable(false);
+		// Disable the "Done" button so user doesn't enter their activities again and subtract additional money from their total money
 		btnDoneActivities.setDisable(true);
+		
+		// Enable the "Next" button since Activities Scenario is done
+		btnStartCruise.setDisable(false);
 	}
 	
+	/**
+	 * Shows the last screen (scene) of the game; this screen shows the results of the
+	 * overall game.
+	 */
 	private void showEndScreen() {
+		// Local constants
 		final int SCREEN_WIDTH = 1160, END_SCREEN_HEIGHT = 750;
 		final int IMG_HEIGHT = 200;
 		
+		// Root node for this JavaFX scene graph (VBox)
 		VBox root = new VBox(GAP);
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		root.setAlignment(Pos.CENTER);
 		
-		// 3 Images, including result (depending on whether the player lost or won)
+		// HBox to hold 3 ImageViews
 		HBox hbxHeader = new HBox(GAP);
+		hbxHeader.setAlignment(Pos.CENTER);
+		
+		// ImageView holding Image of the ship 
 		ImageView imgOasis = new ImageView(new Image(getClass().getResource("/images/oasisOTS.png").toString()));
 		imgOasis.setFitHeight(IMG_HEIGHT);
 		imgOasis.setPreserveRatio(true);
+		
+		// ImageView holding Image of Royal Caribbean's logo 
 		ImageView imgLogo = new ImageView(new Image(getClass().getResource("/images/logo2.png").toString()));
 		imgLogo.setFitHeight(IMG_HEIGHT);
 		imgLogo.setPreserveRatio(true);
+		
+		// ImageView holding result (if the passenger won or lost) 
 		ImageView imgResult = new ImageView();
 		imgResult.setFitHeight(IMG_HEIGHT);
 		imgResult.setPreserveRatio(true);
-		if (passenger.getWinStatus()) {
+		
+		// Set the result Image (depends on whether or not the passenger won)
+		if (passenger.getWinStatus()) {	// if passenger won ($+ left)
 			imgResult.setImage(new Image(getClass().getResource("/images/winner.png").toString()));
-		} else {
+		} else {	// if passenger lost ($0 or $- left)
 			imgResult.setImage(new Image(getClass().getResource("/images/loser.png").toString()));
 		}
-		hbxHeader.getChildren().addAll(imgOasis, imgLogo, imgResult);
-		hbxHeader.setAlignment(Pos.CENTER);
-		root.getChildren().add(hbxHeader);
 		
-		// Info
+		// Add children (3 Images) to HBox parent node
+		hbxHeader.getChildren().addAll(imgOasis, imgLogo, imgResult);
+		root.getChildren().add(hbxHeader);	// add HBox to root node
+		
+		// Add Label to output the end of game stats
 		lblResult.setText(passenger.showOverallResult());
 		lblResult.setFont(Font.font(XL_FONT));
 		root.getChildren().addAll(lblResult);
 		
-		// Images section
+		// Section for images at the bottom (HBox parent node)
 		HBox hbxImages = new HBox(GAP);
+		hbxImages.setAlignment(Pos.CENTER);
+		
+		// ImageView holding Image of Oasis OTS' pool deck
 		ImageView imgPoolDeck = new ImageView(new Image(getClass().getResource("/images/poolDeck.png").toString()));
 		imgPoolDeck.setFitHeight(IMG_HEIGHT);
 		imgPoolDeck.setPreserveRatio(true);
+		
+		// ImageView holding Image of Oasis OTS' boardwalk
 		ImageView imgBoardwalk = new ImageView(new Image(getClass().getResource("/images/boardwalkView.png").toString()));
 		imgBoardwalk.setFitHeight(IMG_HEIGHT);
 		imgBoardwalk.setPreserveRatio(true);
+		
+		// ImageView holding Image of Oasis OTS' mini golf
 		ImageView imgMiniGolfCourse = new ImageView(new Image(getClass().getResource("/images/golf.png").toString()));
 		imgMiniGolfCourse.setFitHeight(IMG_HEIGHT);
 		imgMiniGolfCourse.setPreserveRatio(true);
+		
+		// ImageView holding Image of sailaway on Oasis OTS in NYC
 		ImageView imgSailaway = new ImageView(new Image(getClass().getResource("/images/nyc.png").toString()));
 		imgSailaway.setFitHeight(IMG_HEIGHT);
 		imgSailaway.setPreserveRatio(true);
+		
+		// ImageView holding Image of Oasis OTS' ultimate abyss 10-story dry slide
 		ImageView imgUltimateAbyss = new ImageView(new Image(getClass().getResource("/images/ultimateAbyss.png").toString()));
 		imgUltimateAbyss.setFitHeight(IMG_HEIGHT);
 		imgUltimateAbyss.setPreserveRatio(true);
+		
+		// ImageView holding Image of Oasis & Enchantment OTS at Royal Caribbean's private Island, Perfect Day at CocoCay
 		ImageView imgShips = new ImageView(new Image(getClass().getResource("/images/oasisAndEnchantment.png").toString()));
 		imgShips.setFitHeight(IMG_HEIGHT);
 		imgShips.setPreserveRatio(true);
-		hbxImages.getChildren().addAll(imgPoolDeck, imgBoardwalk, imgMiniGolfCourse, imgSailaway, imgUltimateAbyss, imgShips);
-		hbxImages.setAlignment(Pos.CENTER);
-		root.getChildren().add(hbxImages);
 		
-		Window routeWindow = mainScene.getWindow();
+		// Add children (6 ImageViews) to HBox parent node
+		hbxImages.getChildren().addAll(imgPoolDeck, imgBoardwalk, imgMiniGolfCourse, imgSailaway, imgUltimateAbyss, imgShips);
+		root.getChildren().add(hbxImages);	// add HBox to root node
+		
+		// Change the scene graph of the previous stage to this one
+		Window previousWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, END_SCREEN_HEIGHT);
 		
-		if (routeWindow instanceof Stage) {
-			Stage myStage = (Stage) routeWindow;
+		if (previousWindow instanceof Stage) {
+			Stage myStage = (Stage) previousWindow;
 			myStage.setTitle("End Screen");
 			myStage.setScene(mainScene);
 			myStage.show();
