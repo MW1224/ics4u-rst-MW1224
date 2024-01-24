@@ -47,46 +47,45 @@ import javafx.stage.Window;
 public class CruiseStoryGame extends Application {
 	
 	// Global constants
-	private static final int GAP = 10, SMALL_GAP = 3;	// gaps for layout
+	private static final int GAP = 10, SMALL_GAP = 3;
 	private static final int SCREEN_HEIGHT = 900;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	private static final Image CLOSED_LOCK = new Image(CruiseStoryGame.class.getResource("/images/closedLock.png").toString());
 	private static final Image OPEN_LOCK = new Image(CruiseStoryGame.class.getResource("/images/openLock.png").toString());
-	private static final int LOCK_NUM_INDEX = 5;
-	private static final Image imgBLANK = new Image(CruiseStoryGame.class.getResource("/images/white.png").toString());
+	private static final int LOCK_NUM_INDEX = 5;	// index of lock number in string representation of each lock ("lock #")
 	private static final int NUM_OF_POSSIBLE_WORDS = WordUnscramble.NUM_OF_POSSIBLE_WORDS;
 	
-	// Input/output UI controls & global variables
+	// Global variables & input/output UI controls
 	private Passenger passenger;
-	private Label lblTitle, lblInstructions, lblResult, lblRemainingMoney, lblErrorMessage, lblBonusMoney;
-	private boolean eventDone;
 	private int dayNumber = 1;
+	private Label lblTitle, lblInstructions, lblResult, lblRemainingMoney, lblErrorMessage, lblBonusMoney;
 	private Button btnEndGame, btnStartCruise;
+	private Scene mainScene;
+	
 	// For Cruise Story Game main screen
 	private Label lblHighScore;
 	private TextField txtFirstName, txtLastName;
 	private ChoiceBox<String> chcLoyaltyStatus;
-	private Scene mainScene;
 	// For Cruise Route Random Selection screen
 	private RouteCard[][] routeGrid;
 	private Label lblRoute;
 	// For Packing Scenario screen
 	private PackingScenario packingScenario;
-	private int[] itemQuantities;
 	private Label lblWeight;
+	private int[] itemQuantities;
+	private boolean eventDone;
 	// For Royal Escape Room Mini Game screen
 	private EscapeRoom royalEscapeRoom;
-	private int actualLockNum, lockIndex = 0, chosenLockNum;
 	private ImageView imgLock;
-	private Label lblClue, lblLockNum, lblLockState, lblHint;
-	private int[] lockComboNums;
 	private HBox hbxSliders;
+	private Label lblClue, lblLockNum, lblLockState, lblHint, lblWordPyramid;
 	private Button btnHint, btnNextLock;
 	private ChoiceBox<String> chcLocks;
 	private GridPane gridVisual;
-	private Label lblWordPyramid;
 	private TextField txtWord, txtLockCombo;
 	private Button btnUnlock;
+	private int actualLockNum, lockIndex = 0, chosenLockNum;
+	private int[] lockComboNums;
 	// For Word Unscramble Mini Game screen
 	private WordUnscramble wordUnscrambleGame;
 	private Button btnDone;
@@ -112,29 +111,31 @@ public class CruiseStoryGame extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 		// Local constants
-		final int TILE_HEIGHT = 185, TILE_WIDTH = 200;
+		final int TILE_HEIGHT = 185, TILE_WIDTH = 200;	// dimensions for tiles in TilePane
 		final int IMG_HEIGHT = 175;
 		final int SCREEN_WIDTH = 1100;
 		
-		// Set layout
-		VBox root = new VBox(GAP);
+		// Set layout (root node for this JavaFX scene graph)
+		VBox root = new VBox(GAP);		// instantiate VBox with GAP in between its child nodes
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
-		root.setAlignment(Pos.CENTER);
+		root.setAlignment(Pos.CENTER);	// make sure VBox is centered in the screen
 		
-		// Load from file
+		// Load high score from file
 		int highScore = FileHandler.loadFromFile();
+		
+		// Instantiate Passenger object with the high score loaded from file
 		passenger = new Passenger(highScore);
 		
-		// Add title Label
+		// Add title Label to root
 		lblTitle = new Label("Welcome to the Cruise Story Game!");
 		lblTitle.setFont(Font.font(XL_FONT));
 		root.getChildren().add(lblTitle);
 		
-		// Add ImageView holding Royal Caribbean's logo
+		// Add ImageView holding Royal Caribbean's logo to root
 		ImageView imgLogo = new ImageView(new Image(getClass().getResource("/images/logo.png").toString()));
 		root.getChildren().add(imgLogo);
 		
-		// TilePane layout
+		// TilePane layout for images and instructions
 		TilePane tileInstructions = new TilePane(GAP, 0);
 		tileInstructions.setAlignment(Pos.CENTER);
 		
@@ -171,25 +172,29 @@ public class CruiseStoryGame extends Application {
 		imgOasisTop.setFitHeight(IMG_HEIGHT);
 		imgOasisTop.setPreserveRatio(true);
 		
-		// Label to hold the game's intro & overall instructions
-		Label lblIntro = new Label(Passenger.showGameIntro());
-		lblIntro.setFont(Font.font(MEDIUM_FONT));
-		lblIntro.setWrapText(true);
+		// Label to hold the game's overall intro & instructions
+		lblInstructions = new Label(Passenger.showGameIntro());
+		lblInstructions.setFont(Font.font(MEDIUM_FONT));
+		lblInstructions.setWrapText(true);
+		
 		// Label to hold game's goal information
 		Label lblGoal = new Label(Passenger.showGameGoal());
 		lblGoal.setFont(Font.font(MEDIUM_FONT));
 		lblGoal.setWrapText(true);
-		tileInstructions.getChildren().addAll(imgOasis, imgAquaTheatre, imgOasis2, lblIntro, imgBoardwalk, imgOasisBack, lblGoal, imgCentralPark, imgCentralPark2, imgOasisTop);
+		
+		// Add the 10 child nodes to the TilePane parent node (the eight images & two labels)
+		tileInstructions.getChildren().addAll(imgOasis, imgAquaTheatre, imgOasis2, lblInstructions, imgBoardwalk, imgOasisBack, lblGoal, imgCentralPark, imgCentralPark2, imgOasisTop);
 		tileInstructions.setPrefTileHeight(TILE_HEIGHT);
 		tileInstructions.setPrefTileWidth(TILE_WIDTH);
 		tileInstructions.setPrefHeight(TILE_HEIGHT * 2);
 		tileInstructions.setPrefWidth(TILE_WIDTH * 5);
-		root.getChildren().add(tileInstructions);	// Add this TilePane to the Vbox root
+		root.getChildren().add(tileInstructions);	// add this TilePane to the Vbox root
 		
-		// GridPane to obtain input for passenger's information
+		// GridPane for passenger's information input
 		GridPane gridPassengerInfo = new GridPane();
-		gridPassengerInfo.setHgap(GAP);	// sets gaps between columns
-		gridPassengerInfo.setVgap(GAP);	// sets gaps between rows
+		gridPassengerInfo.setAlignment(Pos.CENTER);
+		gridPassengerInfo.setHgap(GAP);	// set gaps between columns
+		gridPassengerInfo.setVgap(GAP);	// set gaps between rows
 		
 		// Label for instructions for passenger to enter their information
 		Label lblPassengerInfo = new Label(Passenger.showPassengerInfoPrompt());
@@ -200,41 +205,48 @@ public class CruiseStoryGame extends Application {
 		Label lblFirstName = new Label("First name:");
 		lblFirstName.setFont(Font.font(MEDIUM_FONT));
 		gridPassengerInfo.add(lblFirstName, 0, 1, 2, 1);	// pos (0,1), colspan = 2, rowspan = 1
+		
 		// TextField for passenger's first name
 		txtFirstName = new TextField();
 		gridPassengerInfo.add(txtFirstName, 2, 1, 2, 1);	// pos (2,1), colspan = 2, rowspan = 1
+		
 		// Label for passenger's last name
 		Label lblLastName = new Label("Last name:");
 		lblLastName.setFont(Font.font(MEDIUM_FONT));
 		gridPassengerInfo.add(lblLastName, 6, 1, 2, 1);	// pos (6,1), colspan = 2, rowspan = 1
+		
 		// TextField for passenger's first name
 		txtLastName = new TextField();
 		gridPassengerInfo.add(txtLastName, 8, 1, 2, 1);	// pos (8,1), colspan = 2, rowspan = 1
+		
 		// Label for passenger's loyalty status
 		Label lblLoyaltyStatus = new Label("Crown & Anchor Society status:");
 		lblLoyaltyStatus.setFont(Font.font(MEDIUM_FONT));
-		gridPassengerInfo.add(lblLoyaltyStatus, 1, 2, 2, 1);	// pos (1,3), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(lblLoyaltyStatus, 1, 2, 2, 1);	// pos (1,2), colspan = 2, rowspan = 1
+		
 		// ChoiceBox for loyalty status options
 		chcLoyaltyStatus = new ChoiceBox<String>();
 		chcLoyaltyStatus.getItems().addAll(Passenger.LOYALTY_STATUSES);
-		gridPassengerInfo.add(chcLoyaltyStatus, 3, 2, 2, 1);	// pos (3,3), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(chcLoyaltyStatus, 3, 2, 2, 1);	// pos (3,2), colspan = 2, rowspan = 1
+		
 		// Label to display overall high score between all games played before
 		lblHighScore = new Label(passenger.showHighScore());
 		lblHighScore.setFont(Font.font(MEDIUM_FONT));
-		gridPassengerInfo.add(lblHighScore, 1, 3, 2, 1);	// pos (1,4), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(lblHighScore, 1, 3, 2, 1);	// pos (1,3), colspan = 2, rowspan = 1
+		
 		// Button for event handler to reset high score out of all games played to $0
 		Button btnResetHighScore = new Button("Reset high score counter");
 		btnResetHighScore.setFont(Font.font(SMALL_FONT));
-		gridPassengerInfo.add(btnResetHighScore, 4, 3, 2, 1);	// pos (4,4), colspan = 2, rowspan = 1
+		gridPassengerInfo.add(btnResetHighScore, 4, 3, 2, 1);	// pos (4,3), colspan = 2, rowspan = 1
 		btnResetHighScore.setOnAction(event -> resetHighScore());
+		
 		// Button for event handler to create passenger with their information
 		Button btnFinish = new Button("Done entering info");
 		btnFinish.setFont(Font.font(SMALL_FONT));
-		gridPassengerInfo.add(btnFinish, 8, 3, 2, 1);	// pos (8,4), colspan = 1, rowspan = 1
+		gridPassengerInfo.add(btnFinish, 8, 3, 2, 1);	// pos (8,3), colspan = 2, rowspan = 1
 		btnFinish.setOnAction(event -> addPassengerInfo());
-		// Add this GridPane to the VBox root
-		gridPassengerInfo.setAlignment(Pos.CENTER);
-		root.getChildren().add(gridPassengerInfo);
+	
+		root.getChildren().add(gridPassengerInfo);	// add this GridPane to the Vbox root
 		
 		// Add label in case of error message to bottom of VBox root
 		lblErrorMessage = new Label("");
@@ -249,57 +261,84 @@ public class CruiseStoryGame extends Application {
 		myStage.show();
 	}
 	
+	/**
+	 * Method to reset high score out all games - event handler method for
+	 * the "Reset high score counter" Button. Updates the high score Label to
+	 * show the new high score of $0.
+	 */
 	private void resetHighScore() {
-		passenger.resetHighScore();
-		lblHighScore.setText(passenger.showHighScore());
+		passenger.resetHighScore();		// reset high score to $0
+		lblHighScore.setText(passenger.showHighScore());	// output new high score of $0
 	}
 	
+	/**
+	 * Method to add information to Passenger object - event handler method for
+	 * the "Done entering info" Button. Also, validates user input to make sure
+	 * TextFields are not empty. If there is no problem with user input, it shows the
+	 * next screen (Cruise Route Random Selection).
+	 */
 	private void addPassengerInfo() {
+		// Local variables to hold values from TextFields
 		String firstName, lastName, loyaltyStatus;
+		
+		// Store input from UI controls in the local variables
 		firstName = txtFirstName.getText().trim();
 		lastName = txtLastName.getText().trim();
 		loyaltyStatus = chcLoyaltyStatus.getValue();
 		
+		// Input validation: Make sure all TextFields are not empty & a loyalty status is chosen from the menu
 		if (firstName.isEmpty() || lastName.isEmpty() || loyaltyStatus == null) {
-			lblErrorMessage.setText("Please enter information in all fields! (no empty boxes)");
+			lblErrorMessage.setText("Please enter information in all fields! (no empty boxes)");	// output error message
 			return;
 		}
 		
+		// Set passenger's properties
 		passenger.setFirstName(firstName);
 		passenger.setLastName(lastName);
 		passenger.setLoyaltyStatus(loyaltyStatus);
 		
+		// Show next screen: Cruise Route Random Selection
 		showCruiseRouteScreen();
 	}
 	
+	/**
+	 * Method to add information to Passenger object - event handler method for
+	 * the "Done entering info" Button. Also, validates user input to make sure
+	 * TextFields are not empty. If there is no problem with user input, it shows the
+	 * next screen (Cruise Route Random Selection).
+	 */
 	private void showCruiseRouteScreen() {
+		
 		// Local constants
-		final int GRID_DIMENSION = 4;
+		final int GRID_DIMENSION = 4;	// number of columns for TilePane
 		final int TILE_DIMENSION = RouteCard.CARD_DIMENSION + 10;
 		final int SCREEN_WIDTH = 790;
 		
 		// Local variable
 		int cardNum = 1;
 		
-		// Root node for this JavaFX scene graph
+		// Set layout (root node for this JavaFX scene graph)
 		BorderPane root = new BorderPane();
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
 		// TOP section of the BorderPane layout
-		VBox vbxTop = new VBox();
+		// Parent node: VBox
+		VBox vbxTop = new VBox(SMALL_GAP);
 		vbxTop.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		vbxTop.setAlignment(Pos.CENTER);
+		
 		// Label for title
 		lblTitle.setText("Cruise Route Random Selection");
+		
 		// Label for instructions
-		lblInstructions = new Label(RouteCard.showInstructions());
-		lblInstructions.setFont(Font.font(MEDIUM_FONT));
-		lblInstructions.setWrapText(true);
-		// Add to parent node VBox
+		lblInstructions.setText(RouteCard.showInstructions());
+		
+		// Add the 2 Labels to VBox parent node
 		vbxTop.getChildren().addAll(lblTitle, lblInstructions);
-		root.setTop(vbxTop);
+		root.setTop(vbxTop);	// add VBox to root node
 		
 		// CENTER section of the BorderPane layout
+		// Parent node: TilePane
 		TilePane tileCenter = new TilePane(GAP, GAP);
 		tileCenter.setPrefColumns(GRID_DIMENSION);
 		tileCenter.setPrefTileHeight(TILE_DIMENSION);
@@ -312,36 +351,44 @@ public class CruiseStoryGame extends Application {
 		for (int row = 0; row < routeGrid.length; row++) {
 			for (int col = 0; col < routeGrid[row].length; col++) {
 				routeGrid[row][col] = new RouteCard(cardNum);	// instantiate each RouteCard in the 2D array
-				routeGrid[row][col].setOnAction(event -> selectRoute(event));
-				tileCenter.getChildren().add(routeGrid[row][col]);
+				routeGrid[row][col].setOnAction(event -> selectRoute(event));	// add event handler for each RouteCard
+				tileCenter.getChildren().add(routeGrid[row][col]);	// add RouteCard to parent node (TilePane)
 				
-				cardNum++;
+				cardNum++;	// increment card number
 			}
 		}
-		root.setCenter(tileCenter);
+		
+		root.setCenter(tileCenter);	// add TilePane to root node
 		
 		// LEFT section of the BorderPane layout
+		// Label to show passenger's remaining money
 		lblRemainingMoney = new Label(passenger.showMoneyLeft());
 		lblRemainingMoney.setFont(Font.font(MEDIUM_FONT));
 		lblRemainingMoney.setPrefWidth(100);
 		lblRemainingMoney.setWrapText(true);
+		
 		root.setLeft(lblRemainingMoney);
 		BorderPane.setAlignment(lblRemainingMoney, Pos.CENTER);
 		
 		// RIGHT section of the BorderPane layout
+		// Add button to show next screen (Packing Scenario)
 		Button btnNext = new Button("Next");
 		btnNext.setFont(Font.font(MEDIUM_FONT));
-		root.setRight(btnNext);
-		BorderPane.setAlignment(btnNext, Pos.CENTER);
 		btnNext.setOnAction(event -> showPackingScenarioScreen());
 		
-		// Bottom section of the BorderPane layout
+		root.setRight(btnNext);
+		BorderPane.setAlignment(btnNext, Pos.CENTER);
+		
+		// BOTTOM section of the BorderPane layout
+		// Label to output the cruise's route & its cost
 		lblRoute = new Label("");
 		lblRoute.setFont(Font.font(MEDIUM_FONT));
 		lblRoute.setWrapText(true);
+		
 		root.setBottom(lblRoute);
 		BorderPane.setAlignment(lblRoute, Pos.CENTER);
 		
+		// Change the scene graph of the previous stage
 		Window mainWindow = mainScene.getWindow();
 		mainScene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
@@ -353,6 +400,10 @@ public class CruiseStoryGame extends Application {
 		}
 	}
 	
+	/**
+	 * Method to flip over card and select its route - event handler method for
+	 * the RouteCards. 
+	 */
 	private void selectRoute(ActionEvent event) {
 		// The getSource() method returns the Object (RouteCard that was clicked) that generated this event
 		RouteCard temp = (RouteCard) event.getSource();	// cast to RouteCard object to access getValue() method from RouteCard class
@@ -1025,6 +1076,8 @@ public class CruiseStoryGame extends Application {
 	
 	private void showWordUnscrambleScreen() {
 		final int SCREEN_WIDTH = 750, THIS_SCREEN_HEIGHT = 800;
+		
+		final Image imgBLANK = new Image(CruiseStoryGame.class.getResource("/images/white.png").toString());
 		
 		BorderPane root = new BorderPane();
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
