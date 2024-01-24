@@ -19,8 +19,8 @@ public class EscapeRoom extends MiniGame {
 			, "Height of pyramid"};		// lock clues for locks 1-5 (in order)
 	private static final String[] LOCK_HINTS = {"Lock 1 - Do a quick Google search!", "Lock 2 - Number of blue beach umbrellas.",
 			"Lock 3 - Number of times Oasis OTS appears in each column.", "Lock 4  - Number of times each letter (i/a/s) appears.",
-			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom - each night # increments by 1",
-			"Pyramid's number of rows."};	// lock hints for locks 1-5 (in order)
+			"Lock 5 - Night NUMBERS of formal nights in increasing order (left to right; top to bottom)",
+"Pyramid's number of rows."};	// lock hints for locks 1-5 (in order)
 	private static final Lock[] LOCKS = new Lock[6];	// 6 total Locks in order of lock #'s (lock 1-6) in Escape Room mini game
 	private static final int[] LOCK_INDICES = {0, 1, 0, 0, 1};	// updated locks' indices in ArrayList after previous locks have been removed
 	
