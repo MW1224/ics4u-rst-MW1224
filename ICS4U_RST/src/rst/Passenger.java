@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Passenger {
 	// Class data fields
 	public static final String[] LOYALTY_STATUSES = {"Gold", "Platinum", "Emerald", "Diamond", "Diamond Plus", "Pinnacle"};		// the 6 Royal Caribbean loyalty statuses 
-	public static final int START_MONEY = 1650;		// passenger starts with $1650
+	public static final int START_MONEY = 1600;		// passenger starts with $1600
 	
 	// Instance data fields
 	private String firstName, lastName, loyaltyStatus;
@@ -20,14 +20,14 @@ public class Passenger {
 	
 	/**
 	 * This default constructor creates a Passenger with a no first or last name,
-	 * no loyalty status, $1650 total money, true winStatus (is winner because have
+	 * no loyalty status, $1600 total money, true winStatus (is winner because have
 	 * positive total money left), $0 high score and 2 mini games left.
 	 */
 	public Passenger() {
 		firstName = null;
 		lastName = null;
 		loyaltyStatus = null;
-		totalMoney = START_MONEY;	// $1650 starting money for total money
+		totalMoney = START_MONEY;	// $1600 starting money for total money
 		highScore = 0;				// default high score of 0
 		winStatus = true;			// positive money left so win status is true
 		miniGamesLeft.add(EscapeRoom.NAME);			// add royal escape room to mini games that haven't been played yet
@@ -36,7 +36,7 @@ public class Passenger {
 	
 	/**
 	 * This overloaded constructor creates a Passenger with no first or last name,
-	 * no loyalty status, $1650 total money; is winner true winStatus (is winner
+	 * no loyalty status, $1600 total money; is winner true winStatus (is winner
 	 * because have positive total money left), given high score and 2 mini games left.
 	 * 
 	 * @param hScore
@@ -46,7 +46,7 @@ public class Passenger {
 		firstName = null;
 		lastName = null;
 		loyaltyStatus = null;
-		totalMoney = START_MONEY;	// $1650 starting money for total money
+		totalMoney = START_MONEY;	// $1600 starting money for total money
 		highScore = hScore;
 		winStatus = true;			// positive money left so win status is true
 		miniGamesLeft.add(EscapeRoom.NAME);			// add royal escape room to mini games that haven't been played yet
@@ -55,7 +55,7 @@ public class Passenger {
 	
 	/**
 	 * This overloaded constructor creates a Passenger with a their first and last name,
-	 * their loyalty status, $2000 total money, true winStatus (is winner because have
+	 * their loyalty status, $1600 total money, true winStatus (is winner because have
 	 * positive total money left), given high score; and 2 mini games left.
 	 * 
 	 * @param fName
