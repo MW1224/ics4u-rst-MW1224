@@ -1,6 +1,11 @@
 package rst;
 
+/**
+ * The <code>Lock</code> class models a lock. It contains the lock's clue, hint, combination
+ * (combo), state, lock number and hint count. It can be unlocked.
+ */
 public class Lock {
+	// Instance data fields
 	private String clue, hint, combo;
 	private boolean state;	// false if locked, true if unlocked
 	private int lockNumber, hintCount;
@@ -72,15 +77,6 @@ public class Lock {
 	
 	public int getLockNumber() {
 		return lockNumber;
-	}
-	
-	public boolean equals(Object obj) {
-		Lock testLock = (Lock) obj;
-		if (testLock.getLockNumber() == lockNumber && testLock.getCombo().equals(combo) && testLock.getClue().equals(clue) && testLock.getHint().equals(hint)) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 	
 	public String toString() {
