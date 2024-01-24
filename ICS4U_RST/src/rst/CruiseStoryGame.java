@@ -1096,6 +1096,7 @@ public class CruiseStoryGame extends Application {
 				// Update remaining money & output to passenger
 				passenger.updateTotalMoney(royalEscapeRoom.getBonusMoney());
 				lblRemainingMoney.setText(passenger.showMoneyLeft());
+				lblRemainingMoney.setVisible(true);
 			}
 		} else {
 			lblBonusMoney.setText(royalEscapeRoom.showBonusAmount());	// show bonus money after fee
@@ -1257,7 +1258,8 @@ public class CruiseStoryGame extends Application {
 		hbxUnlocking.getChildren().addAll(btnUnlock, lblResult, lblBonusMoney);
 		root.getChildren().add(hbxUnlocking);	// add HBox to root node
 		
-		// Button for event handler to end game
+		// UI Controls (Label & Button for event handler to end game) after passenger unlocks last lock
+		lblRemainingMoney.setVisible(false);
 		btnEndGame.setVisible(false);	// don't show yet because haven't received word or lock combination input yet
 		root.getChildren().addAll(lblRemainingMoney, btnEndGame);	// also add remaining money label to root
 		
