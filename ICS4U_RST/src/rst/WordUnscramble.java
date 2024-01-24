@@ -32,7 +32,7 @@ public class WordUnscramble extends MiniGame {
 	public static String showInstructions() {
 		return "Using the letters below, you must create as many words as possible:\n\t- The words don't"
 				+ " need to use all " + WORD.length() + " letters\n\t- No duplicate words\n\t- Words must"
-				+ "be actual words\n\t- Only click 'done' when you're done entering all your words";
+				+ " be actual words\n\t- Only click 'done' when you're done entering all your words";
 	}
 	
 	/**
