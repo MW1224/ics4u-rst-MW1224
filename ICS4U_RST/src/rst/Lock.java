@@ -10,6 +10,22 @@ public class Lock {
 	private boolean state;	// false if locked, true if unlocked
 	private int lockNumber, hintCount;
 	
+	/**
+	 * This constructor creates a Lock with its specified clue, hint,
+	 * combination and lock number; false state (locked); and a hint count of 0
+	 * 
+	 * @param lockClue
+	 * 			Lock's clue (a broad hint as to what the combination is)
+	 * 
+	 * @param lockHint
+	 * 			Lock's hint (a clear hint as to what the combination is)
+	 * 
+	 * @param lockCombo
+	 * 			Lock's correct combination
+	 * 
+	 * @param lockNum
+	 * 			Lock's number (relating the other locks)
+	 */
 	public Lock(String lockClue, String lockHint, String lockCombo, int lockNum) {
 		clue = lockClue;
 		hint =lockHint;
@@ -19,9 +35,23 @@ public class Lock {
 		hintCount = 0;
 	}
 	
+	/**
+	 * This constructor creates a Lock with its specified clue, hint
+	 * and lock number; a null combination; false state (locked); and
+	 * a hint count of 0
+	 * 
+	 * @param lockClue
+	 * 			Lock's clue (a broad hint as to what the combination is)
+	 * 
+	 * @param lockHint
+	 * 			Lock's hint (a clear hint as to what the combination is)
+	 * 
+	 * @param lockNum
+	 * 			Lock's number (relating the other locks)
+	 */
 	public Lock(String lockClue, String lockHint, int lockNum) {
 		clue = lockClue;
-		hint =lockHint;
+		hint = lockHint;
 		state = false;
 		combo = null;
 		lockNumber = lockNum;
