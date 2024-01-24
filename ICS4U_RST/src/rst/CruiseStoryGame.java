@@ -1460,7 +1460,7 @@ public class CruiseStoryGame extends Application {
 		for (int i = 0; i < possibleWords.length; i++) {
 			strPossibleWords += possibleWords[i];
 			if (i % 2 == 0) {	// even
-				strPossibleWords += "\t\t";
+				strPossibleWords += "\t";
 			} else if (i != possibleWords.length - 1) {	// odd
 				strPossibleWords += "\n";
 			}
