@@ -47,7 +47,7 @@ import javafx.stage.Window;
 public class CruiseStoryGame extends Application {
 	
 	// Global constants
-	private static final int GAP = 10, SMALL_GAP = 3;
+	private static final int GAP = 10, SMALL_GAP = 3;	// gaps for layout
 	private static final int SCREEN_HEIGHT = 900;
 	private static final int SMALL_FONT = 15, MEDIUM_FONT = 17, LARGE_FONT = 20, XL_FONT = 26;
 	private static final Image CLOSED_LOCK = new Image(CruiseStoryGame.class.getResource("/images/closedLock.png").toString());
@@ -363,7 +363,7 @@ public class CruiseStoryGame extends Application {
 		// Change remaining money left
 		boolean disabledCard = temp.getState();
 		if (!disabledCard) {
-			passenger.updateTotalMoney(temp.getChangeInMoney());
+			passenger.updateTotalMoney(temp.getCost());
 			lblRemainingMoney.setText(passenger.showMoneyLeft());
 					
 			lblRoute.setText(temp.showResult());
