@@ -36,7 +36,7 @@ public class Lock {
 	}
 	
 	/**
-	 * This constructor creates a Lock with its specified clue, hint
+	 * This overloaded constructor creates a Lock with its specified clue, hint
 	 * and lock number; a null combination; false state (locked); and
 	 * a hint count of 0
 	 * 
